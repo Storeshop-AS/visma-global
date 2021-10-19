@@ -15,7 +15,7 @@ export async function customerEtlProcess(tenant: any, tokenInfo: any) {
         const result = await customerService.loadCustomersToXp(transformedCusrData, tenant);
         messageLog(tenant.user, "Customers import status - Total: " + customers.length + ",  Successfully synchronized: " + result.successfulEntryCount + ", Failed to synchronized: " + result.failedEntryCount + "  \n");
 
-    } catch (error) {
+    } catch (error: any) {
         messageLog(tenant.user, "Customer import failed.");
         messageLog(tenant.user, error);
     }

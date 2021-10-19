@@ -8,8 +8,8 @@
   },
   "tenants": [
     {
-      "user": "inopa",
-      "password": "snarterdetjul2018",
+      "user": "lillehammer",
+      "password": "tpwcom62020",
       "integration": "visma-global"
     }
   ]

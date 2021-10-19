@@ -96,7 +96,7 @@ export class OrderService {
             });
             return { success: true, message: "Successfully order is created" };
 
-        } catch (error) {
+        } catch (error: any) {
             return { success: false, message: error.message };
         }
 

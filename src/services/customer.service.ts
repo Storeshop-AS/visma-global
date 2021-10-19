@@ -85,7 +85,7 @@ export class CustomerService {
 
                     messageLog(tenant.user, "Customer ID = " + customer.Id + ", BE Response = " + result.success);
 
-                } catch (error) {
+                } catch (error: any) {
                     failedEntryCount++;
                     console.log('Error :>> ', error.message, error.options);
                     messageLog(tenant.user, "Customer ID = " + customer.Id + ", BE Response =  false");
