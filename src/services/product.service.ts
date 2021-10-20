@@ -26,7 +26,7 @@ export class ProductService {
         const body: any = `<?xml version="1.0" encoding="utf-8" ?>
                             <Articleinfo>
                                 <ClientInfo>
-                                    <Clientid>VitariERP</Clientid>
+                                    <Clientid>${companyId}</Clientid>
                                     <Token>XXXX-XXXX-XXXX-XXXX-XXXX</Token>
                                 </ClientInfo>
                                 <Article>
@@ -114,7 +114,7 @@ export class ProductService {
     * @param  {number} pageNumber
     * @returns { * }
     */
-    public async getProductsFromVismaGlobalByDateChunk(token: any, companyId: any, fromDate: string, toDate: string) {
+    public async getProductsFromVismaGlobalByDateChunk(tenant: any, clientId: any, fromDate: string, toDate: string) {
         const vismaGlobalConfig: any = this.config.vismaGlobal;
         const body: any = `<?xml version="1.0" encoding="UTF-8" ?>
                             <Articleinfo>
@@ -122,6 +122,11 @@ export class ProductService {
                                     <Clientid>VitariERP</Clientid>
                                     <Token>XXXX-XXXX-XXXX-XXXX-XXXX</Token>
                                 </ClientInfo>
+                                <Filters>
+                                    <ChangedDate Operator="" Value1="${fromDate}" Compare="GreaterThanOrEqualTo"/>
+                                    <ChangedDate Operator="AND" Value1="${toDate}" Compare="LessThanOrEqualTo"/>
+                                    <ProcessingMethod7 Operator = "AND" Value1 = "1" Compare = "EqualTo" />
+                                </Filters>
                                 <Article>
                                     <articleid></articleid>
                                     <name></name>
@@ -150,6 +155,7 @@ export class ProductService {
 console.log(JsonResult);
         fs.writeFileSync(`./product-${fromDate}.json`, JSON.stringify(JsonResult, null, ' '));
 
+/*
         let products = [];
         if (JsonResult.Articleinfo && JsonResult.Articleinfo.Status.Message == "OK" &&
             JsonResult.Articleinfo.Article &&
@@ -168,7 +174,8 @@ console.log(JsonResult);
                 products.length == i + 1 && process.stdout.write('\n');
             }
         }
-        return products;
+*/
+        return JsonResult.Articlelist;
     }
 
     /**
@@ -210,6 +217,8 @@ console.log(JsonResult);
             }
             return { success: true, results, successfulEntryCount, failedEntryCount };
         } catch (error) {
+            messageLog(tenant.user, 'ERROR: Loading products to XP');
+console.log(error);
             return { success: false, results, error };
         }
     }
@@ -226,6 +235,7 @@ console.log(JsonResult);
                 Number: product.articleid,  // mandatory field to create a product
                 IsActive: product.inactiveyesno === "0" ? true : false,
                 Price: product.price1 || 0,
+                Updated: product.LastUpdate,
             })
         }
         return transformedData;

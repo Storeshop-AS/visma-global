@@ -8,7 +8,7 @@ import * as fs from 'fs';
  * @param  {any} tokenInfo  { access_token: '..', companyId:'...', ...}
  */
 export async function productEtlProcess(tenant: any, tokenInfo: any) {
-  const companyId = tokenInfo.companyId; // Client ID == companyId
+  const companyId = tenant.clientId;
   const token = tokenInfo.access_token;
   const productService = new ProductService();
   try {
@@ -29,8 +29,7 @@ console.log(products);
  * @param  {any} tokenInfo
  */
 export async function loadInitialProductData(tenant: any, tokenInfo: any) {
-  const dayChunk = 100;
-  const companyId = tokenInfo.companyId;
+  const dayChunk = 10000;
   const token = tokenInfo.access_token;
   const productService = new ProductService();
   let fromDate = moment('01.01.2015', 'DD.MM.YYYY').format('DD.MM.YYYY');
@@ -40,15 +39,20 @@ export async function loadInitialProductData(tenant: any, tokenInfo: any) {
 
   while (1) { 
     try {
-      const products = await productService.getProductsFromVismaGlobalByDateChunk(token, companyId, fromDate, toDate);
+      const products = await productService.getProductsFromVismaGlobalByDateChunk(token, token.ClientId, fromDate, toDate);
+      const transformedProducts = productService.productsDataTransformation(products.Article);
 
-      fs.writeFileSync(`./data/${tenant.user}-products-${page}`, JSON.stringify(products, null, ' '));
+      messageLog(tenant.user, `Received ${products.Article.length} products`);
+      fs.writeFileSync(`./data/${tenant.user}-products-original.json`, JSON.stringify(products, null, ' '));
+      fs.writeFileSync(`./data/${tenant.user}-products-transformed.json`, JSON.stringify(transformedProducts, null, ' '));
+      const result = await productService.loadProductsToXp(transformedProducts, tenant);
+
+      break;
 
       if (moment().isBefore(moment(fromDate, 'DD.MM.YYYY'))) {
         break;  
       }     
       // const transformedProdData = productService.productsDataTransformation(products);
-      // const result = await productService.loadProductsToXp(transformedProdData, tenant);
 
 /*
       if (result.failedEntryCount === 0) {
