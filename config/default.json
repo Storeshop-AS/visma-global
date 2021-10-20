@@ -11,7 +11,8 @@
       "user": "lillehammer",
       "password": "tpwcom62020",
       "integration": "visma-global",
-      "clientId": "VitariERP"
+      "clientId": "VitariERP",
+      "articleid": "1001"
     }
   ]
 }

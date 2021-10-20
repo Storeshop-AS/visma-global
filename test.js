@@ -2,14 +2,18 @@ const config = require('config');
 
 const axios = require('axios').default;
 
+const vismaGlobalConfig = config.get('vismaGlobal');
+const tenant = config.get('tenants')[0];
+console.log(tenant);
+
 const body = `<?xml version="1.0" encoding="utf-8" ?>
 <Articleinfo>
   <ClientInfo>
-    <Clientid>Kontorleverandøren Lillehammer</Clientid>
+    <Clientid>${tenant.clientId}</Clientid>
     <Token>b93b1546-e57d-499c-8320-0d7ff5979552</Token>
   </ClientInfo>
   <Article>
-    <articleid>778059</articleid>
+    <articleid>${tenant.articleid}</articleid>
     <name></name>
     <maingroupno></maingroupno>
     <maingroupno.name></maingroupno.name>
@@ -28,13 +32,11 @@ const body = `<?xml version="1.0" encoding="utf-8" ?>
   </Article>
 </Articleinfo>`
 
-const vismaGlobalConfig = config.get('vismaGlobal');
-
 async function test() {
   try {
     console.log(`POST ${vismaGlobalConfig.api}/Article.svc/GetArticle`);
     const result = await axios.post(vismaGlobalConfig.api + "/Article.svc/GetArticle", body, { timeout: 1 * 60 * 1000 });
-    console.log(result)
+    console.log(result.data)
   }
   catch(err) {
     console.log(err);
