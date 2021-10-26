@@ -4,13 +4,15 @@
     "beBaseUrl": "http://localhost:8181/api"
   },
   "vismaGlobal": {
-    "api": "https://erp.vitari.no/vgws"
+    "api": "http://51.107.214.108:8082"
   },
   "tenants": [
     {
-      "user": "inopa",
-      "password": "snarterdetjul2018",
-      "integration": "visma-global"
+      "user": "lillehammer",
+      "password": "secret",
+      "integration": "visma-global",
+      "clientId": "Kontorleverandøren Lillehammer",
+      "articleid": "778059"
     }
   ]
 }

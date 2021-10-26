@@ -2,6 +2,8 @@ const config = require('config');
 
 const axios = require('axios').default;
 
+const parser = require ('xml2json');
+
 const vismaGlobalConfig = config.get('vismaGlobal');
 const tenant = config.get('tenants')[0];
 console.log(tenant);
@@ -37,9 +39,11 @@ async function test() {
     console.log(`POST ${vismaGlobalConfig.api}/Article.svc/GetArticle`);
     const result = await axios.post(vismaGlobalConfig.api + "/Article.svc/GetArticle", body, { timeout: 1 * 60 * 1000 });
     console.log(result.data)
+    const data = JSON.parse(parser.toJson(result.data));
+    console.log(data);
   }
   catch(err) {
-    console.log(err);
+    console.log(err.code);
   }
 }
 
