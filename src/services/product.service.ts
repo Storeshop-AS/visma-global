@@ -7,6 +7,8 @@ import { messageLog } from './index.service';
 
 const axios = require('axios').default;
 
+const TIMEOUT = 120 * 60 * 1000;
+
 export class ProductService {
 
     public config: any;
@@ -114,13 +116,13 @@ export class ProductService {
     * @param  {number} pageNumber
     * @returns { * }
     */
-    public async getProductsFromVismaGlobalByDateChunk(tenant: any, clientId: string, fromDate: string, toDate: string) {
+    public async getProductsFromVismaGlobalByDateChunk(token: string, clientId: any, fromDate: string, toDate: string) {
         const vismaGlobalConfig: any = this.config.vismaGlobal;
         const body: any = `<?xml version="1.0" encoding="UTF-8" ?>
                             <Articleinfo>
                                 <ClientInfo>
-                                    <Clientid>${clientId}</Clientid>
-                                    <Token>b93b1546-e57d-499c-8320-0d7ff5979552</Token>
+			   	    <Clientid>${clientId}</Clientid>
+				    <Token>${token}</Token>
                                 </ClientInfo>
                                 <Filters>
                                     <ChangedDate Operator="" Value1="${fromDate}" Compare="GreaterThanOrEqualTo"/>
@@ -128,7 +130,7 @@ export class ProductService {
                                     <ProcessingMethod7 Operator = "AND" Value1 = "1" Compare = "EqualTo" />
                                 </Filters>
                                 <Article>
-                                    <articleid></articleid>
+					<articleid></articleid>
                                     <name></name>
                                     <maingroupno></maingroupno>
                                     <maingroupno.name></maingroupno.name>
@@ -150,7 +152,9 @@ export class ProductService {
                                 </Article>
                             </Articleinfo>`;
 
-        const result = await axios.post(vismaGlobalConfig.api + "/Article.svc/GetArticles", body);
+
+	messageLog(clientId, `POST ${vismaGlobalConfig.api}/Article.svc/GetArticles`);
+	const result = await axios.post(vismaGlobalConfig.api + '/Article.svc/GetArticles', body, { timeout: TIMEOUT });
         const JsonResult: any = JSON.parse(parser.toJson(result.data));
 console.log(JsonResult);
         fs.writeFileSync(`./product-${fromDate}.json`, JSON.stringify(JsonResult, null, ' '));

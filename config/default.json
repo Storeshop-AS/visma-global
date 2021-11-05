@@ -9,7 +9,7 @@
   "tenants": [
     {
       "user": "lillehammer",
-      "password": "tpwcom62020",
+      "password": "secret",
       "integration": "visma-global",
       "clientId": "VitariERP",
       "articleid": "1001",

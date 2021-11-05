@@ -39,13 +39,13 @@ export async function loadInitialProductData(tenant: any, tokenInfo: any) {
 
   while (1) { 
     try {
-      const products = await productService.getProductsFromVismaGlobalByDateChunk(token, token.ClientId, fromDate, toDate);
+      const products = await productService.getProductsFromVismaGlobalByDateChunk(token, tenant.clientId, fromDate, toDate);
       const transformedProducts = productService.productsDataTransformation(products.Article);
 
       messageLog(tenant.user, `Received ${products.Article.length} products`);
       fs.writeFileSync(`./data/${tenant.user}-products-original.json`, JSON.stringify(products, null, ' '));
       fs.writeFileSync(`./data/${tenant.user}-products-transformed.json`, JSON.stringify(transformedProducts, null, ' '));
-      const result = await productService.loadProductsToXp(transformedProducts, tenant);
+      // const result = await productService.loadProductsToXp(transformedProducts, tenant);
 
       break;
 
