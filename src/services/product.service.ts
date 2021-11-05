@@ -114,13 +114,13 @@ export class ProductService {
     * @param  {number} pageNumber
     * @returns { * }
     */
-    public async getProductsFromVismaGlobalByDateChunk(tenant: any, clientId: any, fromDate: string, toDate: string) {
+    public async getProductsFromVismaGlobalByDateChunk(tenant: any, clientId: string, fromDate: string, toDate: string) {
         const vismaGlobalConfig: any = this.config.vismaGlobal;
         const body: any = `<?xml version="1.0" encoding="UTF-8" ?>
                             <Articleinfo>
                                 <ClientInfo>
-                                    <Clientid>VitariERP</Clientid>
-                                    <Token>XXXX-XXXX-XXXX-XXXX-XXXX</Token>
+                                    <Clientid>${clientId}</Clientid>
+                                    <Token>b93b1546-e57d-499c-8320-0d7ff5979552</Token>
                                 </ClientInfo>
                                 <Filters>
                                     <ChangedDate Operator="" Value1="${fromDate}" Compare="GreaterThanOrEqualTo"/>

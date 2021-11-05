@@ -7,6 +7,7 @@
     "devStart": "nodemon ./src/index.ts",
     "start": "ts-node src",
     "initialDataImport": "ts-node ./src/initial-data-import/index",
+    "load": "ts-node ./src/load/index",
     "build": "tsc -p ."
   },
   "keywords": [],
@@ -15,7 +16,7 @@
   "dependencies": {
     "@types/moment": "^2.13.0",
     "@types/request": "^2.48.5",
-    "axios": "^0.22.0",
+    "axios": "^0.24.0",
     "body-parser": "^1.19.0",
     "config": "^2.0.2",
     "cors": "^2.8.5",
