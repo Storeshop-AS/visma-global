@@ -3,7 +3,7 @@ import * as config from "config";
 import moment from "moment"
 
 import { TenantService, TokenService, messageLog } from "../services/index.service";
-import { INTEGRATIONS } from "../models/common.model";
+// import { INTEGRATIONS } from "../models/common.model";
 // import { loadInitialCustomerData } from "../app/customer/customer";
 import { loadInitialProductData } from "../app/product/product";
 
@@ -13,6 +13,10 @@ async function initialImportProductAndCustomerData() {
     return;
   }
 
+  if (true) {
+    console.log("Tenant user: " + process.env.npm_config_user);
+    return;
+  }
   console.log("Tenant user: " + process.env.npm_config_user);
   const tenantService = new TenantService();
   const tenant = tenantService.getTenantByUser(process.env.npm_config_user as string);

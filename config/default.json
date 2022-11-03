@@ -12,7 +12,8 @@
       "password": "secret",
       "integration": "visma-global",
       "clientId": "VitariERP",
-      "articleid": "1001"
+      "articleid": "1001",
+      "url": "http://localhost:8080/admin/_/service/com.storeshop.app"
     }
   ]
 }
