@@ -9,7 +9,7 @@
   "tenants": [
     {
       "user": "lillehammer",
-      "password": "secret",
+      "password": "tpwcom62020",
       "integration": "visma-global",
       "clientId": "Kontorleverandøren Lillehammer",
       "articleid": "778059"

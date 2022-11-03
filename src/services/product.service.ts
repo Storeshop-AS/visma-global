@@ -22,14 +22,14 @@ export class ProductService {
      * @param  {any} companyId company id comes from visma global system
      * @returns { * }
      */
-    public async getProductsFromVismaGlobal(token: any, companyId: any) {
+    public async getProductsFromVismaGlobal(token: any, companyId: any, tenant: any) {
         const vismaGlobalConfig: any = this.config.vismaGlobal;
 
         const body: any = `<?xml version="1.0" encoding="utf-8" ?>
                             <Articleinfo>
                                 <ClientInfo>
                                     <Clientid>${companyId}</Clientid>
-                                    <Token>XXXX-XXXX-XXXX-XXXX-XXXX</Token>
+                                    <Token>${token}</Token>
                                 </ClientInfo>
                                 <Article>
                                     <articleid></articleid>
@@ -54,17 +54,30 @@ export class ProductService {
                                 </Article>
                             </Articleinfo>`;
 
-        const result = await post({
-            url: vismaGlobalConfig.api + "/Article.svc/GetArticles",
+        const url = vismaGlobalConfig.api + "/Article.svc/GetArticles";
+
+        let returnResult: any[] = [];
+        await post({
+            url,
             body,
             json: false,
-        });
-        const JsonResult = JSON.parse(parser.toJson(result));
-        let returnResult = [];
-        if (JsonResult.Articlelist.Article && JsonResult.Articlelist.Article.length > 0) {
-            returnResult = JsonResult.Articlelist.Article;
-        }
-        return returnResult;
+          })
+          .then((result: any) => {
+            messageLog(tenant.user, `POST ${url} [${token}] (${companyId}) SUCCESS`);
+            const JsonResult = JSON.parse(parser.toJson(result));
+            const filename = `./data/${tenant.user}-products-raw-${moment().format('YYYY.DD.MM-HH:mm:ss')}.json`;
+            fs.writeFileSync(filename, JSON.stringify(JsonResult, null, ' '));
+            messageLog(tenant.user, `W ${filename}`);
+            if (JsonResult.Articlelist.Article && JsonResult.Articlelist.Article.length > 0) {
+              messageLog(tenant.user, `Received ${JsonResult.Articlelist.Article.length} products`);
+              returnResult = JsonResult.Articlelist.Article;
+            }
+            return [];
+          })
+          .catch((err: any) => {
+            messageLog(tenant.user, `POST ${url} [${token}] (${companyId}) FAILED: ${err}`);
+          });
+      return returnResult;
     }
 
     /**
@@ -154,10 +167,18 @@ export class ProductService {
 
 
 	messageLog(clientId, `POST ${vismaGlobalConfig.api}/Article.svc/GetArticles`);
-	const result = await axios.post(vismaGlobalConfig.api + '/Article.svc/GetArticles', body, { timeout: TIMEOUT });
-        const JsonResult: any = JSON.parse(parser.toJson(result.data));
-console.log(JsonResult);
-        fs.writeFileSync(`./product-${fromDate}.json`, JSON.stringify(JsonResult, null, ' '));
+	let JsonResult = {Articlelist: []};
+	await axios.post(vismaGlobalConfig.api + '/Article.svc/GetArticles', body, { timeout: TIMEOUT })
+          .then((result: any) => {
+            const filename = `./data/product-${fromDate}.json`;
+            JsonResult = <any>JSON.parse(parser.toJson(result.data));
+            fs.writeFileSync(`./product-${fromDate}.json`, JSON.stringify(JsonResult, null, ' '));
+            messageLog(clientId, `W ${filename}`);
+          })
+          .catch((err: any) => {
+	    messageLog(clientId, `ERR: ${err}`);
+          });
+	// console.log(JsonResult);
 
 /*
         let products = [];
@@ -179,7 +200,7 @@ console.log(JsonResult);
             }
         }
 */
-        return JsonResult.Articlelist;
+        return JsonResult.Articlelist || [];
     }
 
     /**
@@ -187,61 +208,49 @@ console.log(JsonResult);
      * @param  {any} tenant
      */
     public async loadProductsToXp(Products: any, tenant: any) {
-        const headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Basic " + Buffer.from(tenant.user + ":" + tenant.password).toString("base64"),
-        }
+      const headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Basic " + Buffer.from(tenant.user + ":" + tenant.password).toString("base64"),
+      }
 
-        const results = [];
-        let successfulEntryCount = 0;
-        let failedEntryCount = 0;
-        try {
-            for (const product of Products) {
-                const body = product;
-                let result;
-                try {
-                    result = await put({
-                        url: this.config.basicConfig.beBaseUrl + "/articles", body, headers, json: true,
-                    });
+      const results: any = [];
+      let successfulEntryCount = 0;
+      let failedEntryCount = 0;
 
-                    if (result.success) {
-                        successfulEntryCount++;
-                    } else {
-                        failedEntryCount++;
-                    }
-
-                    messageLog(tenant.user, "Product ID = " + product.Id + ", BE Response = " + result.success);
-
-                } catch (error: any) {
-                    failedEntryCount++;
-                    console.log('Error :>> ', error.message, error.options);
-                    messageLog(tenant.user, "Product ID = " + product.Id + ", BE Response =  false");
-                }
-                results.push(result);
-            }
-            return { success: true, results, successfulEntryCount, failedEntryCount };
-        } catch (error) {
-            messageLog(tenant.user, 'ERROR: Loading products to XP');
-console.log(error);
-            return { success: false, results, error };
-        }
+      messageLog(tenant.user, `Loading ${Products.length} to XP`);
+      for (const product of Products) {
+        const body = product;
+        let result;
+	await put({url: this.config.basicConfig.beBaseUrl + "/articles", body, headers, json: true })
+	  .then((result) => {
+	  messageLog(tenant.user, `U ${product.Name} (${typeof product.Name}) [${product.Id}]`);
+            results.push(result);
+            successfulEntryCount++;
+	  })
+	  .catch((err) => {
+            messageLog(tenant.user, `E ${product.Name} (${typeof product.Name}) [${product.Id}]: ${err}`);
+            failedEntryCount++;
+	  });
+      }
+      messageLog(tenant.user, `Finished ${Products.length} to XP`);
+      return {success: true, results, successfulEntryCount, failedEntryCount};
     }
 
     /**
      * @param  {any} customers
      */
     public productsDataTransformation(products: any) {
-        const transformedData = [];
-        for (const product of products) {
-            transformedData.push({
-                Id: product.articleid.toString(),
-                Name: product.name && product.name.trim() || `Name not provided (${product.articleid})`,
-                Number: product.articleid,  // mandatory field to create a product
-                IsActive: product.inactiveyesno === "0" ? true : false,
-                Price: product.price1 || 0,
-                Updated: product.LastUpdate,
-            })
-        }
-        return transformedData;
+      const transformedData = [];
+      for (const product of products) {
+        transformedData.push({
+          Id: product.articleid.toString(),
+          Name: product.name || `Name not provided (${product.articleid})`,
+          Number: product.articleid,  // mandatory field to create a product
+          IsActive: product.inactiveyesno === "0" ? true : false,
+          Price: parseFloat(product.price1 || 0),
+          Updated: product.LastUpdate,
+        })
+      }
+      return transformedData;
     }
 }

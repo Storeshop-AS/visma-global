@@ -1,6 +1,6 @@
+import * as fs from 'fs';
 import moment from 'moment';
 import { ProductService, messageLog } from '../../services/index.service';
-import * as fs from 'fs';
 
 /**
  * Get all products from visma global using API and load to XP
@@ -12,12 +12,19 @@ export async function productEtlProcess(tenant: any, tokenInfo: any) {
   const token = tokenInfo.access_token;
   const productService = new ProductService();
   try {
-    const products = await productService.getProductsFromVismaGlobal(token, companyId);
-console.log(products);
+  const products: any = await productService.getProductsFromVismaGlobal(token, companyId, tenant);
 
-    // const transformedProdData = productService.productsDataTransformation(products);
-    // const result = await productService.loadProductsToXp(transformedProdData, tenant);
-    // messageLog(tenant.user, 'Products import status - Total: ' + products.length + ', Successfully synchronized: ' + result.successfulEntryCount + ', Failed to synchronized: ' + result.failedEntryCount + '  \n');
+    messageLog(tenant.user, `Received ${products?.length} products`);
+    const filename = `./data/${tenant.user}-products-${moment().format('YYYY.DD.MM-HH:mm:ss')}.json`;
+    fs.writeFileSync(filename, JSON.stringify(products, null, ' '));
+    messageLog(tenant.user, `W ${filename}`);
+
+    const tranformedFilename = `./data/${tenant.user}-products-transformed-${moment().format('YYYY.DD.MM-HH:mm:ss')}.json`
+    const transformedProdData = productService.productsDataTransformation(products);
+    fs.writeFileSync(tranformedFilename, JSON.stringify(transformedProdData, null, ' '));
+    messageLog(tenant.user, `W ${tranformedFilename}`);
+    const result = await productService.loadProductsToXp(transformedProdData, tenant);
+    messageLog(tenant.user, 'Products import status - Total: ' + products.length + ', Successfully synchronized: ' + result.successfulEntryCount + ', Failed to synchronized: ' + result.failedEntryCount + '  \n');
   } catch (error: any) {
     messageLog(tenant.user, 'Product import failed.' );
     messageLog(tenant.user, error);
@@ -39,13 +46,13 @@ export async function loadInitialProductData(tenant: any, tokenInfo: any) {
 
   while (1) { 
     try {
-      const products = await productService.getProductsFromVismaGlobalByDateChunk(token, tenant.clientId, fromDate, toDate);
+      const products: any = await productService.getProductsFromVismaGlobalByDateChunk(token, tenant.clientId, fromDate, toDate);
       const transformedProducts = productService.productsDataTransformation(products.Article);
 
-      messageLog(tenant.user, `Received ${products.Article.length} products`);
+      // messageLog(tenant.user, `Received ${products?.Article?.length} products`);
       fs.writeFileSync(`./data/${tenant.user}-products-original.json`, JSON.stringify(products, null, ' '));
       fs.writeFileSync(`./data/${tenant.user}-products-transformed.json`, JSON.stringify(transformedProducts, null, ' '));
-      // const result = await productService.loadProductsToXp(transformedProducts, tenant);
+      const result = await productService.loadProductsToXp(transformedProducts, tenant);
 
       break;
 

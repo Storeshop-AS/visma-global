@@ -15,6 +15,9 @@ export class Article extends BaseEntity {
     @Column({unique: false, nullable: true})
     Number!: string;
 
+    @Column({unique: false, nullable: true})
+    GTIN!: string; // GTIN - Global Trade Item Number
+
     @Column({nullable: true})
     Syncronized!: boolean;
 
@@ -54,8 +57,50 @@ export class Article extends BaseEntity {
     @Column({unique: false, nullable: true})
     Description!: string;
 
+    @Column({unique: false, nullable: true})
+    Summary!: string;
+
     @Column({type: 'timestamp', nullable: true})
     Updated!: Date;
+
+    @Column({nullable: true})
+    Warehouse!: string;
+
+    @Column({nullable: true})
+    ShowOnWeb!: string;
+
+    @Column({nullable: true})
+    ProcessingMethod7!: string
+
+    @Column({nullable: true})
+    ProductPriceGroup1!: string
+
+    @Column({nullable: true})
+    Group1!: string
+
+    @Column({nullable: true})
+    Group4!: string
+
+    @Column({nullable: true})
+    Group5!: string
+
+    @Column({nullable: true})
+    Group6!: string
+
+    @Column({nullable: true})
+    Group7!: string
+
+    @Column({nullable: true})
+    Information1!: string
+
+    @Column({nullable: true})
+    Information2!: string
+
+    @Column({nullable: true})
+    Information3!: string
+
+    @Column({nullable: true})
+    Information4!: string
 
     @ManyToMany(type => Label, label => label.Articles)
     @JoinTable()
