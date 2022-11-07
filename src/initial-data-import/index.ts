@@ -13,10 +13,6 @@ async function initialImportProductAndCustomerData() {
     return;
   }
 
-  if (true) {
-    console.log("Tenant user: " + process.env.npm_config_user);
-    return;
-  }
   console.log("Tenant user: " + process.env.npm_config_user);
   const tenantService = new TenantService();
   const tenant = tenantService.getTenantByUser(process.env.npm_config_user as string);

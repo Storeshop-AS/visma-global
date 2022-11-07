@@ -166,14 +166,18 @@ export class ProductService {
                             </Articleinfo>`;
 
 
+        fs.writeFileSync(`./product-${fromDate}-request.xml`, body);
+	messageLog(clientId, `W ./product-${fromDate}-request.xml`);
 	messageLog(clientId, `POST ${vismaGlobalConfig.api}/Article.svc/GetArticles`);
 	let JsonResult = {Articlelist: []};
 	await axios.post(vismaGlobalConfig.api + '/Article.svc/GetArticles', body, { timeout: TIMEOUT })
           .then((result: any) => {
-            const filename = `./data/product-${fromDate}.json`;
-            JsonResult = <any>JSON.parse(parser.toJson(result.data));
-            fs.writeFileSync(`./product-${fromDate}.json`, JSON.stringify(JsonResult, null, ' '));
+            const filename = `./data/product-${fromDate}-result.xml`;
+            fs.writeFileSync(filename, result);
             messageLog(clientId, `W ${filename}`);
+            JsonResult = <any>JSON.parse(parser.toJson(result.data));
+            fs.writeFileSync(`./data/product-${fromDate}-result.json`, JSON.stringify(JsonResult, null, ' '));
+            messageLog(clientId, `W ./data/product-${fromDate}-result.json`);
           })
           .catch((err: any) => {
 	    messageLog(clientId, `ERR: ${err}`);
