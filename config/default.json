@@ -4,15 +4,15 @@
     "beBaseUrl": "http://localhost:8181/api"
   },
   "vismaGlobal": {
-    "api": "https://erp.vitari.no/vgws"
+    "api": "http://localhost:8082"
   },
   "tenants": [
     {
       "user": "lillehammer",
-      "password": "secret",
+      "password": "tpwcom62020",
       "integration": "visma-global",
-      "clientId": "VitariERP",
-      "articleid": "1001",
+      "clientId": "Kontorleverandøren Lillehammer",
+      "accessToken": "b93b1546-e57d-499c-8320-0d7ff5979552",
       "url": "http://localhost:8080/admin/_/service/com.storeshop.app"
     }
   ]

@@ -5,17 +5,16 @@ const axios = require('axios').default;
 const parser = require ('xml2json');
 
 const vismaGlobalConfig = config.get('vismaGlobal');
-const tenant = config.get('tenants')[0];
+const tenant = config.get('tenants')[1];
 console.log(tenant);
 
 const body = `<?xml version="1.0" encoding="utf-8" ?>
 <Articleinfo>
   <ClientInfo>
     <Clientid>${tenant.clientId}</Clientid>
-    <Token>b93b1546-e57d-499c-8320-0d7ff5979552</Token>
+    <Token>d5f2285f-cfe4-4170-a13f-1ebe4b25132e</Token>
   </ClientInfo>
   <Article>
-    <articleid>${tenant.articleid}</articleid>
     <name></name>
     <maingroupno></maingroupno>
     <maingroupno.name></maingroupno.name>
@@ -36,9 +35,10 @@ const body = `<?xml version="1.0" encoding="utf-8" ?>
 
 async function test() {
   try {
-    console.log(`POST ${vismaGlobalConfig.api}/Article.svc/GetArticle`);
-    const result = await axios.post(vismaGlobalConfig.api + "/Article.svc/GetArticle", body, { timeout: 1 * 60 * 1000 });
-    console.log(result.data)
+    console.log(`POST ${tenant.api}/Article.svc/GetArticles`);
+    console.log(`${body}`);
+    const result = await axios.post(tenant.api + "/Article.svc/GetArticles", body, { timeout: 1 * 60 * 1000 });
+    // console.log(result.data)
     const data = JSON.parse(parser.toJson(result.data));
     console.log(data);
   }

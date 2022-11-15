@@ -1,11 +1,11 @@
-import { get, post, put } from "request-promise-native";
 import * as config from "config";
 
 import { Order } from '../entity/order'
 import { Orderline } from '../entity/orderline'
 
-export class OrderService {
+const axios = require('axios').default;
 
+export class OrderService {
     public config: any;
 
     constructor() {
@@ -13,7 +13,6 @@ export class OrderService {
     }
 
     public orderDataTransformation(order: Order, lines: Orderline[]) {
-        
         const linesData = [];
         for (const line of lines) {
             linesData.push({
@@ -78,7 +77,6 @@ export class OrderService {
      * 
      */
     public async loadOrderToVisma(orders: any, tenant: any, tokenInfo: any) {
-
         const headers = {
             "Authorization": "Bearer " + tokenInfo.access_token,
             "Content-Type": "application/json",
@@ -86,14 +84,12 @@ export class OrderService {
         }
 
         try {
-
             const body: any = orders;
-            const result = await post({
-                url: this.config.vismanet.api + "/salesorderbasic",
+            const result = await axios.post(
+                this.config.vismanet.api + "/salesorderbasic",
                 body,
-                headers,
-                json: true,
-            });
+                { headers, json: true },
+            );
             return { success: true, message: "Successfully order is created" };
 
         } catch (error: any) {

@@ -1,5 +1,4 @@
 import express, { Request, Response } from "express";
-import cors from "cors";
 import { Connection, createConnections, getConnection } from "typeorm";
 import * as config from "config";
 import moment from "moment"
@@ -12,7 +11,6 @@ import { productEtlProcess } from "./app/product/product";
 const port: number = 8600;
 const app = express();
 app.use(express.json());
-app.use(cors());
 
 app.listen(port, () => {
   console.log("Server Started at Port, " + port)
@@ -23,7 +21,7 @@ createConnections().then((connections: Connection[]) => {
 
   // This scheduler will run in every 15 min for extract data from visma global and load to XP
   const SYNC_INTERVAL = 15 * 60 * 1000; // 15 minutes
-  importProductAndCustomerDaemon();
+  // importProductAndCustomerDaemon();
   // setInterval(importProductAndCustomerDaemon, SYNC_INTERVAL)
 
   async function importProductAndCustomerDaemon() {

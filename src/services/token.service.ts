@@ -1,5 +1,3 @@
-
-import { get, post, put } from "request-promise-native";
 import { getConnection } from "typeorm";
 import { Token } from '../entity/token'
 import { TenantService } from "./index.service";
@@ -12,28 +10,6 @@ export class TokenService {
 
     constructor() {
         this.config = config;
-    }
-
-    /**
-     * @param  {any} code Authcode that can be found in redirect url after login the visma.net
-     * @param  {any} state represents the user name of tenant
-     */
-    public getTokenOfVismaNet(code: any, user: any) {
-
-        const tenantService = new TenantService();
-        const tenant = tenantService.getTenantByUser(user);
-
-        const vismaConfig: any = this.config.vismanet;
-        const body = `grant_type=authorization_code&code=${code}&redirect_uri=${tenant.redirectUri}`;
-        return post({
-            url: vismaConfig.tokenUrl,
-            body,
-            json: true,
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-                "Authorization": "Basic " + Buffer.from(tenant.clientId + ":" + tenant.clientSecret).toString("base64"),
-            },
-        })
     }
 
     async saveTokenToDB(tenant: any, access_token: string, companyId:string) {

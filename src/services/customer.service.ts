@@ -1,8 +1,10 @@
-import { get, post, put } from "request-promise-native";
-import * as config from "config";
 import moment from "moment";
-import * as parser from 'xml2json';
+
+import * as config from "config";
+
 import { messageLog } from "./index.service";
+
+const axios = require('axios').default;
 
 export class CustomerService {
 
@@ -17,7 +19,7 @@ export class CustomerService {
      * @param  {any} companyId
      * @returns { * }
      */
-    public async getCustomersFromVismaGlobal(token: any, companyId: any) {
+    public getCustomersFromVismaGlobal(token: any, companyId: any) {
 
         const vismaGlobalConfig: any = this.config.vismaGlobal;
 
@@ -39,17 +41,19 @@ export class CustomerService {
                                 </Customer>
                             </Customerinfo>`;
 
-        const result = await post({
-            url: vismaGlobalConfig.api + "/Customer.svc/GetCustomers",
+        return axios.post(
+            vismaGlobalConfig.api + "/Customer.svc/GetCustomers",
             body,
-            json: false,
-        });
+            {json: false},
+        );
+/*
         const JsonResult = JSON.parse(parser.toJson(result));
         let returnResult = [];
         if (JsonResult.Customerlist.Customer && JsonResult.Customerlist.Customer.length > 0) {
             returnResult = JsonResult.Customerlist.Customer;
         }
         return returnResult;
+*/
     }
 
     /**
@@ -57,25 +61,25 @@ export class CustomerService {
      * @param  {any} tenant
      */
     public async loadCustomersToXp(customers: any, tenant: any) {
-
         const headers = {
             "Authorization": "Basic " + Buffer.from(tenant.user + ":" + tenant.password).toString("base64"),
             "Content-Type": "application/json",
         }
+
         const results = [];
         let successfulEntryCount = 0;
         let failedEntryCount = 0;
+
         try {
             for (const customer of customers) {
                 const body: any = customer;
                 let result;
                 try {
-                    result = await put({
-                        url: this.config.basicConfig.beBaseUrl + "/customers",
+                    result = await axios.put(
+                        this.config.basicConfig.beBaseUrl + "/customers",
                         body,
-                        headers,
-                        json: true,
-                    });
+                        {headers, json: true}
+                    );
 
                     if (result.success) {
                         successfulEntryCount++;

@@ -1,80 +1,52 @@
 import * as fs from 'fs';
 import moment from 'moment';
-import { ProductService, messageLog } from '../../services/index.service';
+import {ProductService, messageLog} from '../../services/index.service';
+
+const xml2js = require('xml2js');
 
 /**
- * Get all products from visma global using API and load to XP
- * @param  {any} tenant
- * @param  {any} tokenInfo  { access_token: '..', companyId:'...', ...}
+ * @param {any} tenant
  */
-export async function productEtlProcess(tenant: any, tokenInfo: any) {
-  const companyId = tenant.clientId;
-  const token = tokenInfo.access_token;
+export async function loadProductData(tenant: any, fromDate: string, dayChunk: number) {
   const productService = new ProductService();
-  try {
-  const products: any = await productService.getProductsFromVismaGlobal(token, companyId, tenant);
-
-    messageLog(tenant.user, `Received ${products?.length} products`);
-    const filename = `./data/${tenant.user}-products-${moment().format('YYYY.DD.MM-HH:mm:ss')}.json`;
-    fs.writeFileSync(filename, JSON.stringify(products, null, ' '));
-    messageLog(tenant.user, `W ${filename}`);
-
-    const tranformedFilename = `./data/${tenant.user}-products-transformed-${moment().format('YYYY.DD.MM-HH:mm:ss')}.json`
-    const transformedProdData = productService.productsDataTransformation(products);
-    fs.writeFileSync(tranformedFilename, JSON.stringify(transformedProdData, null, ' '));
-    messageLog(tenant.user, `W ${tranformedFilename}`);
-    const result = await productService.loadProductsToXp(transformedProdData, tenant);
-    messageLog(tenant.user, 'Products import status - Total: ' + products.length + ', Successfully synchronized: ' + result.successfulEntryCount + ', Failed to synchronized: ' + result.failedEntryCount + '  \n');
-  } catch (error: any) {
-    messageLog(tenant.user, 'Product import failed.' );
-    messageLog(tenant.user, error);
-  }
-}
-
-/**
- * @param  {any} tenant
- * @param  {any} tokenInfo
- */
-export async function loadInitialProductData(tenant: any, tokenInfo: any) {
-  const dayChunk = 10000;
-  const token = tokenInfo.access_token;
-  const productService = new ProductService();
-  let fromDate = moment('01.01.2015', 'DD.MM.YYYY').format('DD.MM.YYYY');
-  let toDate = moment(fromDate, 'DD.MM.YYYY').add(dayChunk, 'd').format('DD.MM.YYYY');
 
   let page = 1;
+  let failed = false;
+  let toDate = moment(fromDate, 'DD.MM.YYYY').add(dayChunk, 'd').format('DD.MM.YYYY');
 
-  while (1) { 
+  while (!failed && moment().isAfter(moment(fromDate, 'DD.MM.YYYY'))) { 
     try {
-      const products: any = await productService.getProductsFromVismaGlobalByDateChunk(token, tenant.clientId, fromDate, toDate);
-      const transformedProducts = productService.productsDataTransformation(products.Article);
+      await productService.getProductsFromVismaGlobalByDateChunk(tenant, fromDate, toDate)
+        .then((result: any) => {
+          fs.writeFileSync(`./data/${tenant.user}-products-${page}.xml`, result.data);
+          messageLog(tenant.user, `  W ./data/${tenant.user}-products-${page}.xml`);
 
-      // messageLog(tenant.user, `Received ${products?.Article?.length} products`);
-      fs.writeFileSync(`./data/${tenant.user}-products-original.json`, JSON.stringify(products, null, ' '));
-      fs.writeFileSync(`./data/${tenant.user}-products-transformed.json`, JSON.stringify(transformedProducts, null, ' '));
-      const result = await productService.loadProductsToXp(transformedProducts, tenant);
+          const parser = new xml2js.Parser();
+          parser.parseStringPromise(result.data)
+            .then((result: any) => {
+              fs.writeFileSync(`./data/${tenant.user}-products-${page}.json`, JSON.stringify(result, null, ' '));
+              messageLog(tenant.user, `  W ./data/${tenant.user}-products-${page}.json`);
 
-      break;
-
-      if (moment().isBefore(moment(fromDate, 'DD.MM.YYYY'))) {
-        break;  
-      }     
-      // const transformedProdData = productService.productsDataTransformation(products);
-
-/*
-      if (result.failedEntryCount === 0) {
-        messageLog(tenant.user, 'From ' + fromDate + ' to ' + toDate + ', Products imported successfully - Total: ' + products.length + ', Successfully synchronized: ' + result.successfulEntryCount + ', Failed to synchronized: ' + result.failedEntryCount + '  \n');
-      } else {
-        messageLog(tenant.user, 'From ' + fromDate + ' to ' + toDate + ', Products import status - Total: ' + products.length + ',  Successfully synchronized: ' + result.successfulEntryCount + ', Failed to synchronized: ' + result.failedEntryCount + '  \n');
-      }     
-*/
-
-      fromDate = toDate;
-      toDate = moment(fromDate, 'DD.MM.YYYY').add(dayChunk, 'd').format('DD.MM.YYYY');
-
-      page++;
+              const products = productService.articleToXpProduct(result);
+              messageLog(tenant.user, `  Received products (${products.length})`);
+              fs.writeFileSync(`./data/${tenant.user}-products-xp-${page}.json`, JSON.stringify(products, null, ' '));
+              messageLog(tenant.user, `  W ./data/${tenant.user}-products-xp-${page}.json`);
+            })
+            .catch((err: any) => {
+              messageLog(tenant.user, `ERROR xml2js(): ${err}`);
+            });
+        })
+        .catch((err: any) => {
+          messageLog(tenant.user, `ERROR productService.getProductsFromVismaGlobalByDateChunk: ${err}`);
+          failed = true;
+        });
     } catch (error: any) {
-      messageLog(tenant.user, 'From ' + fromDate + ' to ' + toDate + ', Products import failed. Error message: ' + error.message + '\n');
+      failed = true;
+      messageLog(tenant.user, 'ERROR products import failed: ' + error);
     }   
-  } 
+
+    fromDate = toDate;
+    toDate = moment(fromDate, 'DD.MM.YYYY').add(dayChunk, 'd').format('DD.MM.YYYY');
+    page++;
+  }
 }
