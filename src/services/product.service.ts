@@ -84,7 +84,7 @@ export class ProductService {
     }
     const url = tenant.url + '/visma-global-products';
     messageLog(tenant.user, `POST ${url}`);
-    return axios.post(url, Products, {headers, maxContentLength: Infinity, maxBodyLength: Infinity});
+    return await axios.post(url, Products, {headers, maxContentLength: Infinity, maxBodyLength: Infinity});
   }
 
   public articleToXpProduct(productData: any): any {
