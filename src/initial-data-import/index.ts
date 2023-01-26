@@ -13,7 +13,7 @@ async function loadInitialProductData() {
 
   const tenantService = new TenantService();
   const tenant = tenantService.getTenantByUser(process.env.npm_config_user as string);
-  const fromDate = moment().subtract(3, 'years').format('DD.MM.YYYY');
+  const fromDate = moment().subtract(1, 'weeks').format('DD.MM.YYYY');
 
   if (!tenant) {
     messageLog(process.env.npm_config_user, 'Tenant not found in config');

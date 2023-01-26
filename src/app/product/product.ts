@@ -27,10 +27,20 @@ export async function loadProductData(tenant: any, fromDate: string, dayChunk: n
               fs.writeFileSync(`./data/${tenant.user}-products-${page}.json`, JSON.stringify(result, null, ' '));
               messageLog(tenant.user, `  W ./data/${tenant.user}-products-${page}.json`);
 
-              const products = productService.articleToXpProduct(result);
+              // Get formatted products to send on XP
+              const products = productService.getFormattedProducts(result);
               messageLog(tenant.user, `  Received products (${products.length})`);
               fs.writeFileSync(`./data/${tenant.user}-products-xp-${page}.json`, JSON.stringify(products, null, ' '));
-              messageLog(tenant.user, `  W ./data/${tenant.user}-products-xp-${page}.json`);
+
+              const xpApiRes = productService.loadProductsToXp(products, tenant);
+              messageLog(tenant.user, `  XP API response: ${JSON.stringify(xpApiRes, null, ' ')}`);
+
+              // START - The following codes are not necessary due to create another new API to send direct to XP
+              // const products = productService.articleToXpProduct(result);
+              // messageLog(tenant.user, `  Received products (${products.length})`);
+              // fs.writeFileSync(`./data/${tenant.user}-products-xp-${page}.json`, JSON.stringify(products, null, ' '));
+              // messageLog(tenant.user, `  W ./data/${tenant.user}-products-xp-${page}.json`);
+              // END
             })
             .catch((err: any) => {
               messageLog(tenant.user, `ERROR xml2js(): ${err}`);

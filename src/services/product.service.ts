@@ -84,7 +84,7 @@ export class ProductService {
     }
     const url = tenant.url + '/visma-global-products';
     messageLog(tenant.user, `POST ${url}`);
-    return axios.post(url, Products, {headers});
+    return axios.post(url, Products, {headers, maxContentLength: Infinity, maxBodyLength: Infinity});
   }
 
   public articleToXpProduct(productData: any): any {
@@ -103,6 +103,28 @@ export class ProductService {
         };
         if (product.data.IsActive) {
           products.push(product);
+        }
+      }
+    }
+
+    return products;
+  }
+
+  public getFormattedProducts(productData: any): any {
+    let products = [];
+    if (productData?.Articlelist?.Article) {
+      for (let article of productData.Articlelist.Article) {
+        const IsActive = article?.inactiveyesno?.[0] !== '0';
+        const name = article?.name?.[0] || '';
+
+        if (IsActive && name.length > 0) {
+          products.push({
+            ExternalId: article?.articleid?.[0] || '',
+            name,
+            price: parseFloat(article?.price1?.[0] || 0),
+            stock: parseInt(article['StockSurvey.Available']?.[0] || 0, 10),
+            IsActive
+          });
         }
       }
     }
