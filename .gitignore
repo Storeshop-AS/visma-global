@@ -2,5 +2,6 @@ build/
 logs/
 node_modules/
 data/*.json
+data/*.xml
 nohup.out
 *.swp

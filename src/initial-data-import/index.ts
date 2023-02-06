@@ -13,7 +13,7 @@ async function loadInitialProductData() {
 
   const tenantService = new TenantService();
   const tenant = tenantService.getTenantByUser(process.env.npm_config_user as string);
-  const fromDate = moment().subtract(1, 'weeks').format('DD.MM.YYYY');
+  const fromDate = moment().subtract(3, 'years');
 
   if (!tenant) {
     messageLog(process.env.npm_config_user, 'Tenant not found in config');
@@ -22,7 +22,7 @@ async function loadInitialProductData() {
 
   try {
     messageLog(tenant.user, `-- Start of initial data import`);
-    await loadProductData(tenant, fromDate, 100);
+    await loadProductData(tenant, fromDate);
   } catch (e: any) {
     messageLog(process.env.npm_config_user, 'ERROR initial data import: ' + e.message);
   }

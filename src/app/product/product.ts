@@ -4,59 +4,65 @@ import {ProductService, messageLog} from '../../services/index.service';
 
 const xml2js = require('xml2js');
 
+export async function uploadProductsToXp(products: any, tenant: any) {
+  const productService = new ProductService();
+  const uploadResult = await productService.loadProductsToXp(products, tenant)
+    .then((result) => {
+      messageLog(tenant.user, `  Products (${products?.length}) uploaded XP (${result.status})`);
+    })
+    .catch((err) => {
+      messageLog(tenant.user, `  ERROR uploadProductsToXp(): ${err}`);
+    });
+  return uploadResult;
+}
+
 /**
  * @param {any} tenant
  */
-export async function loadProductData(tenant: any, fromDate: string, dayChunk: number) {
+export async function loadProductData(tenant: any, fromDate: moment.Moment) {
   const productService = new ProductService();
 
-  let page = 1;
   let failed = false;
-  let toDate = moment(fromDate, 'DD.MM.YYYY').add(dayChunk, 'd').format('DD.MM.YYYY');
 
-  while (!failed && moment().isAfter(moment(fromDate, 'DD.MM.YYYY'))) { 
-    try {
-      await productService.getProductsFromVismaGlobalByDateChunk(tenant, fromDate, toDate)
-        .then((result: any) => {
-          fs.writeFileSync(`./data/${tenant.user}-products-${page}.xml`, result.data);
-          messageLog(tenant.user, `  W ./data/${tenant.user}-products-${page}.xml`);
+  // NOTES on 2. February 2023:
+  // The LastUpdate date filter for Visma Global doesn't actually work,
+  // so we will receive all records for every request.
+  // With the updated XP service we will only update records that has actually changed.
 
-          const parser = new xml2js.Parser();
-          parser.parseStringPromise(result.data)
-            .then((result: any) => {
-              fs.writeFileSync(`./data/${tenant.user}-products-${page}.json`, JSON.stringify(result, null, ' '));
-              messageLog(tenant.user, `  W ./data/${tenant.user}-products-${page}.json`);
+  try {
+    const _fromDate = fromDate.format('DD.MM.YYYY');
+    await productService.getProductsFromVismaGlobalByDateChunk(tenant, _fromDate)
+      .then(async (result: any) => {
+        const filename = `./data/${tenant.user}-products-${_fromDate}.xml`;
+        fs.writeFileSync(filename, result.data);
+        messageLog(tenant.user, `  W ${filename}`);
 
-              // Get formatted products to send on XP
-              const products = productService.getFormattedProducts(result);
-              messageLog(tenant.user, `  Received products (${products.length})`);
-              fs.writeFileSync(`./data/${tenant.user}-products-xp-${page}.json`, JSON.stringify(products, null, ' '));
+        const parser = new xml2js.Parser();
+        await parser.parseStringPromise(result.data)
+          .then((result: any) => {
+            const jsonFilename = `./data/${tenant.user}-products-${_fromDate}.json`;
+            fs.writeFileSync(jsonFilename, JSON.stringify(result, null, ' '));
+            messageLog(tenant.user, `  W ${jsonFilename} [${result?.Articlelist?.Article?.length} products]`);
 
-              const xpApiRes = productService.loadProductsToXp(products, tenant);
-              messageLog(tenant.user, `  XP API response: ${JSON.stringify(xpApiRes, null, ' ')}`);
+            // Get formatted products to send to XP
+            const products = productService.getFormattedProducts(tenant, result, fromDate);
+            const xpFilename = `./data/${tenant.user}-products-xp-${_fromDate}.json`;
 
-              // START - The following codes are not necessary due to create another new API to send direct to XP
-              // const products = productService.articleToXpProduct(result);
-              // messageLog(tenant.user, `  Received products (${products.length})`);
-              // fs.writeFileSync(`./data/${tenant.user}-products-xp-${page}.json`, JSON.stringify(products, null, ' '));
-              // messageLog(tenant.user, `  W ./data/${tenant.user}-products-xp-${page}.json`);
-              // END
-            })
-            .catch((err: any) => {
-              messageLog(tenant.user, `ERROR xml2js(): ${err}`);
-            });
-        })
-        .catch((err: any) => {
-          messageLog(tenant.user, `ERROR productService.getProductsFromVismaGlobalByDateChunk: ${err}`);
-          failed = true;
-        });
-    } catch (error: any) {
-      failed = true;
-      messageLog(tenant.user, 'ERROR products import failed: ' + error);
-    }   
+            fs.writeFileSync(xpFilename, JSON.stringify(products, null, ' '));
+            messageLog(tenant.user, `  W ${xpFilename} [${products?.length} products]`);
 
-    fromDate = toDate;
-    toDate = moment(fromDate, 'DD.MM.YYYY').add(dayChunk, 'd').format('DD.MM.YYYY');
-    page++;
-  }
+            uploadProductsToXp(products, tenant);
+          })
+          .catch((err: any) => {
+            messageLog(tenant.user, `ERROR xml2js(): ${err}`);
+          });
+      })
+      .catch((err: any) => {
+        messageLog(tenant.user, `ERROR productService.getProductsFromVismaGlobalByDateChunk: ${err}`);
+        failed = true;
+      });
+  } catch (error: any) {
+    failed = true;
+    messageLog(tenant.user, 'ERROR products import failed: ' + error);
+  }   
 }

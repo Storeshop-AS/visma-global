@@ -21,7 +21,7 @@ export class ProductService {
     * @param  {number} pageNumber
     * @returns { * }
     */
-  public getProductsFromVismaGlobalByDateChunk(tenant: any, fromDate: string, toDate: string) {
+  public getProductsFromVismaGlobalByDateChunk(tenant: any, fromDate: string) {
     const vismaGlobalConfig: any = this.config.vismaGlobal;
     const body = `<?xml version="1.0" encoding="UTF-8" ?>
        <Articleinfo>
@@ -29,10 +29,6 @@ export class ProductService {
          <Clientid>${tenant.clientId}</Clientid>
          <Token>${tenant.accessToken}</Token>
        </ClientInfo>
-       <Filters>
-         <ChangedDate Operator="" Value1="${fromDate}" Compare="GreaterThanOrEqualTo"/>
-         <ChangedDate Operator="AND" Value1="${toDate}" Compare="LessThanOrEqualTo"/>
-       </Filters>
        <Article>
          <articleid></articleid>
          <name></name>
@@ -49,7 +45,7 @@ export class ProductService {
          <StartDateOfferPrice></StartDateOfferPrice>
          <StopDateOfferPrice></StopDateOfferPrice>
          <inactiveyesno></inactiveyesno>
-         <LastUpdate></LastUpdate>
+         <LastUpdate>&gt;${fromDate}</LastUpdate>
          <StockSurvey.WarehouseNo></StockSurvey.WarehouseNo>
          <StockSurvey.UnitInStock></StockSurvey.UnitInStock>
          <StockSurvey.Available></StockSurvey.Available>
@@ -59,7 +55,7 @@ export class ProductService {
     const url = vismaGlobalConfig.api + '/Article.svc/GetArticles';
     const filename = `./data/${tenant.user}-${fromDate}-request.xml`;
     fs.writeFileSync(filename, body);
-    messageLog(tenant.user, `POST ${url} (${fromDate}-${toDate})`);
+    messageLog(tenant.user, `  POST ${url} (${fromDate})`);
     messageLog(tenant.user, `  W ${filename}`);
 
     const config = {
@@ -83,14 +79,14 @@ export class ProductService {
       "Authorization": "Basic " + Buffer.from(tenant.user + ":" + tenant.password).toString("base64"),
     }
     const url = tenant.url + '/visma-global-products';
-    messageLog(tenant.user, `POST ${url}`);
+    messageLog(tenant.user, `  POST ${url}`);
     return await axios.post(url, Products, {headers, maxContentLength: Infinity, maxBodyLength: Infinity});
   }
 
   public articleToXpProduct(productData: any): any {
     let products = [];
     if (productData?.Articlelist?.Article) {
-      for (let article of productData.Articlelist.Article) {
+      for (const article of productData.Articlelist.Article) {
         const product = {
           displayName: article?.name?.[0],
           data: {
@@ -110,17 +106,19 @@ export class ProductService {
     return products;
   }
 
-  public getFormattedProducts(productData: any): any {
+  public getFormattedProducts(tenant: any, productData: any, fromDate: moment.Moment): any {
     let products = [];
+    const _fromDate = fromDate.format('YYYY-MM-DD');
     if (productData?.Articlelist?.Article) {
-      for (let article of productData.Articlelist.Article) {
+      for (const article of productData?.Articlelist?.Article) {
         const IsActive = article?.inactiveyesno?.[0] !== '0';
         const name = article?.name?.[0] || '';
+        const updated = article?.LastUpdate?.[0] || '';
 
-        if (IsActive && name.length > 0) {
+        if (IsActive && name.length > 0 && updated > _fromDate) {
           products.push({
-            ExternalId: article?.articleid?.[0] || '',
             name,
+            ExternalId: article?.articleid?.[0] || '',
             price: parseFloat(article?.price1?.[0] || 0),
             stock: parseInt(article['StockSurvey.Available']?.[0] || 0, 10),
             IsActive
@@ -129,6 +127,7 @@ export class ProductService {
       }
     }
 
+    messageLog(tenant.user, `  filtered ${products.length} products`);
     return products;
   }
 }

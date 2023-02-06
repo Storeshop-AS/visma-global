@@ -14,37 +14,27 @@ app.use(express.json());
 
 app.listen(port, () => {
   console.log("Server Started at Port, " + port);
-})
 
-// This scheduler will run in every 1 hour min for extract data from visma global and load to XP
-const SYNC_INTERVAL = 60 * 60 * 1000; // 60 minutes
+  // This scheduler will run in every 1 hour min for extract data from visma global and load to XP
+  const SYNC_INTERVAL = 60 * 60 * 1000; // 60 minutes
 
-importProductAndCustomerDaemon();
-setInterval(importProductAndCustomerDaemon, SYNC_INTERVAL);
+  importProductAndCustomerDaemon();
+  // setInterval(importProductAndCustomerDaemon, SYNC_INTERVAL);
 
-async function importProductAndCustomerDaemon() {
-  const tenantService = new TenantService();
-  const tenants = tenantService.getTenantsByIntegration(INTEGRATIONS.vismaGlobal);
-
-  for (const tenant of tenants) {
-    try {
-      if (tenant) {
-        const fromDate = moment().subtract(1, 'weeks').format('DD.MM.YYYY');
-
-        try {
-          messageLog(tenant.user, `-- Start of data sync`);
-          await loadProductData(tenant, fromDate, 1);
-        }
-        catch (e: any) {
-          messageLog('', 'ERROR data sync: ' + e.message);
-        }
+  async function importProductAndCustomerDaemon() {
+    const tenantService = new TenantService();
+    const tenants = tenantService.getTenantsByIntegration(INTEGRATIONS.vismaGlobal);
+  
+    for (const tenant of tenants) {
+      const fromDate = moment().subtract(7, 'days');
+  
+      try {
+        messageLog(tenant.user, `-- Start of data sync from ${fromDate.format('DD.MM.YYYY')}`);
+        await loadProductData(tenant, fromDate);
       }
-      else {
-        messageLog('', `Tenant not found in config`);
+      catch (e: any) {
+        messageLog(tenant.user, 'ERROR data sync: ' + e);
       }
-    }
-    catch (e: any) {
-      messageLog("", "daemon " + e.message);
     }
   }
-}
+})
