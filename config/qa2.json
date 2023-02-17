@@ -8,11 +8,23 @@
   },
   "tenants": [
     {
+      "user": "nansen",
+      "password": "tpwcom62020",
+      "integration": "visma-global",
+      "api": "https://connect.noroil.as:8082",
+      "clientId": "Noroil Lubricants AS",
+      "accessToken": "dab2f1e5-547a-4cfd-8220-3f95adb19c21",
+      "url": "https://nansen.storeshop.no/admin/_/service/com.storeshop.app"
+    },
+    {
       "user": "lillehammer",
       "password": "tpwcom62020",
       "integration": "visma-global",
       "clientId": "Kontorleverandøren Lillehammer",
-      "articleid": "778059"
+      "articleid": "778059",
+      "api": "http://51.107.214.108:8082",
+      "accessToken": "b93b1546-e57d-499c-8320-0d7ff5979552",
+      "url": "https://www.kontorleverandoren.as/admin/_/service/com.storeshop.app"
     }
   ]
 }
