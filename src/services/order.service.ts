@@ -86,7 +86,7 @@ export class OrderService {
         try {
             const body: any = orders;
             const result = await axios.post(
-                this.config.vismanet.api + "/salesorderbasic",
+                tenant.api + "/salesorderbasic",
                 body,
                 { headers, json: true },
             );
