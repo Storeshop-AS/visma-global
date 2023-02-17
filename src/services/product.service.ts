@@ -18,11 +18,12 @@ export class ProductService {
 
   /**
     * @param  {any} companyId company id comes from visma business erp system
-    * @param  {number} pageNumber
+    * @param  {date} fromDate
     * @returns { * }
     */
   public getProductsFromVismaGlobalByDateChunk(tenant: any, fromDate: string) {
     const vismaGlobalConfig: any = this.config.vismaGlobal;
+
     const body = `<?xml version="1.0" encoding="UTF-8" ?>
        <Articleinfo>
        <ClientInfo>
@@ -62,11 +63,7 @@ export class ProductService {
       headers: {'Content-Type': 'text/xml', Accept: 'application/xml'}
     };
 
-    return axios.post(
-        url,
-        body,
-        config
-    );
+    return axios.post(url, body, config);
   }
 
   /**
