@@ -94,7 +94,7 @@ export class ProductService {
             price: parseFloat(article?.price1?.[0] || 0),
             stock: parseInt(article['StockSurvey.Available']?.[0] || 0, 10),
             accountingLastChanged: article.LastUpdate?.[0],
-            IsActive: article?.inactiveyesno?.[0] !== '0'
+            IsActive: article?.inactiveyesno?.[0] === '0'
           }
         };
         if (product.data.IsActive) {
