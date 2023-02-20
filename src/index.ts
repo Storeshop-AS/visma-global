@@ -45,7 +45,7 @@ app.listen(port, () => {
         const customers = await loadCustomerData(tenant, fromDate);
         const products = await loadProductData(tenant, fromDate);
 
-        const xpResponse = await vismaGlobalUpdateToXp(tenant, customers.slice(0, 10), products.slice(0, 10));
+        const xpResponse = await vismaGlobalUpdateToXp(tenant, customers(0, 1000), products.slice(0, 1000));
         console.log(xpResponse?.data || 'No response found!');
       }
       catch (e: any) {
