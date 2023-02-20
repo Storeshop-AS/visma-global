@@ -1,17 +1,16 @@
 import moment from "moment";
 
 import * as config from "config";
-
+import * as fs from 'fs';
 import { messageLog } from "./index.service";
 
 const axios = require('axios').default;
 
 export class CustomerService {
-
     public config: any;
-
+  
     constructor() {
-        this.config = config;
+      this.config = config;
     }
 
     /**
@@ -19,41 +18,60 @@ export class CustomerService {
      * @param  {any} companyId
      * @returns { * }
      */
-    public getCustomersFromVismaGlobal(token: any, companyId: any) {
-
+    public getCustomersFromVismaGlobal(tenant: any, fromDate: string) {
         const vismaGlobalConfig: any = this.config.vismaGlobal;
 
-        const body: any = `<?xml version="1.0" encoding="utf-8" ?>
-                            <Customerinfo>
-                                <ClientInfo>
-                                    <Clientid>VitariERP</Clientid>
-                                </ClientInfo>
-                                <Customer>
-                                    <customerId></customerId>
-                                    <name></name>
-                                    <companyno></companyno>
-                                    <telephone></telephone>
-                                    <emailaddress></emailaddress>
-                                    <CustomerGrpNo>4</CustomerGrpNo>
-                                    <LastUpdate></LastUpdate>
-                                    <ZUsrSuperOfficeID></ZUsrSuperOfficeID>
-                                    <invoiceaddress.InvoiceAddressPostCode/>
-                                </Customer>
-                            </Customerinfo>`;
+        const body: any = `<?xml version="1.0" encoding="UTF-8"?>
+            <Customerinfo>
+                <ClientInfo>
+                    <Clientid>${tenant.clientId}</Clientid>
+                    <Token>${tenant.accessToken}</Token>
+                </ClientInfo>
+                <Status>
+                    <MessageId/>
+                    <Message/>
+                    <MessageDetail/>
+                </Status>
+                <Customer>
+                    <AssociateNo/>
+                    <CustomerNo/>
+                    <InvoiceCustomerNo/>
+                    <SendToAssociateNo/>
+                    <Name/>
+                    <ShortName/>
+                    <Mobile/>
+                    <Phone/>
+                    <Fax/>
+                    <EmailAddress/>
+                    <WebPage/>
+                    <CompanyNo/>
+                    <CountryCode/>
+                    <LanguageCode/>
+                    <BankAccountNo/>
+                    <PaymentTerms/>
+                    <AddressLine1/>
+                    <AddressLine2/>
+                    <AddressLine3/>
+                    <AddressLine4/>
+                    <PostCode/>
+                    <PostalArea/>
+                    <VisitPostCode/>
+                    <VisitPostalArea/>
+                    <ChangedDate/>
+                </Customer>
+            </Customerinfo>`;
 
-        return axios.post(
-            vismaGlobalConfig.api + "/Customer.svc/GetCustomers",
-            body,
-            {json: false},
-        );
-/*
-        const JsonResult = JSON.parse(parser.toJson(result));
-        let returnResult = [];
-        if (JsonResult.Customerlist.Customer && JsonResult.Customerlist.Customer.length > 0) {
-            returnResult = JsonResult.Customerlist.Customer;
-        }
-        return returnResult;
-*/
+        const url = vismaGlobalConfig.api + "/Customer.svc/GetCustomers";
+        const filename = `./data/${tenant.user}-${fromDate}-customer-request.xml`;
+        fs.writeFileSync(filename, body);
+        messageLog(tenant.user, `  POST ${url} (${fromDate})`);
+        messageLog(tenant.user, `  W ${filename}`);
+    
+        const config = {
+          headers: {'Content-Type': 'text/xml', Accept: 'application/xml'}
+        };
+    
+        return axios.post(url, body, config);
     }
 
     /**
@@ -107,25 +125,29 @@ export class CustomerService {
     /**
      * @param  {any} customers
      */
-    public customerDataTransformation(customers: any) {
+    public getFormattedCustomers(customerData: any): any {
+        let customers = [];
+        if (customerData?.Customerlist?.Customer) {
+            for (const customer of customerData?.Customerlist?.Customer) {
+                const name = customer?.Name?.[0] || '';
+                const CustomerNo = customer?.CustomerNo?.[0] || '';
+                const EmailAddress = customer?.EmailAddress?.[0] || '';
+                const CompanyNo = customer?.CompanyNo?.[0] || '';
+                const postalcode = customer?.PostCode?.[0] || '';
 
-        const transformedData = [];
-        for (const customer of customers) {
-
-            let postalCode = customer.InvoiceAddresses.InvoiceAddress['invoiceaddress.InvoiceAddressPostCode'];
-
-            transformedData.push({
-                Id: customer.customerId,
-                Name: customer.name,
-                CustomerNumber: customer.customerId,    // mandatory field to create a customer
-                EmailAddress: typeof customer.emailaddress !== 'object' && customer.emailaddress !== null ? customer.emailaddress : null,
-                InvoicePostalCode: typeof postalCode !== 'object' && postalCode !== null ? postalCode : null,
-                ContactPersonPhone: typeof customer.telephone !== 'object' && customer.telephone !== null ? customer.telephone : null
-            })
-
+                if (name.length > 0 && CustomerNo.length > 0) {
+                    customers.push({
+                        Id: CustomerNo,
+                        name,
+                        CustomerNumber: CustomerNo,    // mandatory field to create a customer
+                        EmailAddress,
+                        CompanyNo,
+                        postalcode
+                    });
+                }
+            }
         }
-        return transformedData;
 
+        return customers;
     }
-
 }

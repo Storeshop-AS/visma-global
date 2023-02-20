@@ -1,11 +1,13 @@
 import express, { Request, Response } from "express";
 import { Connection, createConnections, getConnection } from "typeorm";
 import * as config from "config";
-import moment from "moment"
+import moment from "moment";
+
+const axios = require('axios').default;
 
 import { TenantService, TokenService, messageLog } from "./services/index.service";
 import { INTEGRATIONS } from "./models/common.model";
-import { customerEtlProcess } from "./app/customer/customer";
+import { loadCustomerData } from "./app/customer/customer";
 import { loadProductData } from './app/product/product';
 
 const port: number = 8600;
@@ -21,6 +23,16 @@ app.listen(port, () => {
   importProductAndCustomerDaemon();
   // setInterval(importProductAndCustomerDaemon, SYNC_INTERVAL);
 
+  async function vismaGlobalUpdateToXp(tenant: any, customers: any, products: any) {
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Basic " + Buffer.from(tenant.user + ":" + tenant.password).toString("base64"),
+    }
+    const url = tenant.url + '/visma-global-update';
+    messageLog(tenant.user, `  POST ${url}`);
+    return await axios.post(url, {products, customers}, {headers, maxContentLength: Infinity, maxBodyLength: Infinity});
+  }
+
   async function importProductAndCustomerDaemon() {
     const tenantService = new TenantService();
     const tenants = tenantService.getTenantsByIntegration(INTEGRATIONS.vismaGlobal);
@@ -30,7 +42,11 @@ app.listen(port, () => {
   
       try {
         messageLog(tenant.user, `-- Start of data sync from ${fromDate.format('DD.MM.YYYY')}`);
-        await loadProductData(tenant, fromDate);
+        const customers = await loadCustomerData(tenant, fromDate);
+        const products = await loadProductData(tenant, fromDate);
+
+        const xpResponse = await vismaGlobalUpdateToXp(tenant, customers, products);
+        console.log(xpResponse?.data || 'No response found!');
       }
       catch (e: any) {
         messageLog(tenant.user, 'ERROR data sync: ' + e);
