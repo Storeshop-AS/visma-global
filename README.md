@@ -1,4 +1,4 @@
-# Visma.net 
+# Visma Global
 
 ### Prerequisites local development
 - Visma global server only available from vm instance-3
