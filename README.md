@@ -8,6 +8,14 @@
 ### Setting up the ssh tunnel for local developmen
 Command in terminal window ```ssh -L localhost:8082:51.107.214.108:8082 visma-global.storeshop.no -N```
 
+### Setup for https
+Add the url in /etc/hosts, ie. ```127.0.0.1 connect.noroil.as```
+Then the tunnel as this ```ssh -L localhost:8082:connect.noroil.as:8082 visma-global.storeshop.no -N```
+
+### Example requests
+Noroil ```curl -X POST -d "$(cat ./noroil-customer-request.xml)" https://connect.noroil.as:8082/Customer.svc/GetCustomers```
+Lillehammer ```curl -X POST -d "$(cat ./noroil-customer-request.xml)" http://localhost:8082/Customer.svc/GetCustomers```
+
 ### installation process
 To start this app you should follow this instruction:
 1. max `node js` version should be `13.13.0`
