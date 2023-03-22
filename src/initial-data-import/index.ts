@@ -15,7 +15,7 @@ async function vismaGlobalUpdateToXp(tenant: any, customers: any, products: any)
   }
   const url = tenant.url + '/visma-global-update';
   messageLog(tenant.user, `  POST ${url}`);
-  return await axios.post(url, {products, customers}, {headers, maxContentLength: Infinity, maxBodyLength: Infinity});
+  return await axios.post(url, {products, customers, tenant: {clientId: tenant.clientId, accessToken: tenant.accessToken, api: tenant.api}}, {headers, maxContentLength: Infinity, maxBodyLength: Infinity});
 }
 
 async function loadInitialProductData() {
@@ -26,6 +26,7 @@ async function loadInitialProductData() {
 
   const tenantService = new TenantService();
   const tenant = tenantService.getTenantByUser(process.env.npm_config_user as string);
+  const vismaGlobalApi = tenantService?.config?.vismaGlobal?.api;
   const fromDate = moment().subtract(3, 'years');
 
   if (!tenant) {
@@ -35,11 +36,12 @@ async function loadInitialProductData() {
 
   try {
     messageLog(tenant.user, `-- Start of initial data import`);
-    await loadProductData(tenant, fromDate);
+    // await loadProductData(tenant, fromDate);
 
     const customers = await loadCustomerData(tenant, fromDate);
     const products = await loadProductData(tenant, fromDate);
 
+    tenant.api = vismaGlobalApi;
     const xpResponse = await vismaGlobalUpdateToXp(tenant, customers, products);
     console.log(xpResponse?.data || 'No response found!');
   }
