@@ -26,7 +26,6 @@ async function loadInitialProductData() {
 
   const tenantService = new TenantService();
   const tenant = tenantService.getTenantByUser(process.env.npm_config_user as string);
-  const vismaGlobalApi = tenantService?.config?.vismaGlobal?.api;
   const fromDate = moment().subtract(3, 'years');
 
   if (!tenant) {
@@ -41,7 +40,7 @@ async function loadInitialProductData() {
     const customers = await loadCustomerData(tenant, fromDate);
     const products = await loadProductData(tenant, fromDate);
 
-    tenant.api = vismaGlobalApi;
+    tenant.api = tenantService?.config?.vismaGlobal?.api;
     const xpResponse = await vismaGlobalUpdateToXp(tenant, customers, products);
     console.log(xpResponse?.data || 'No response found!');
   }
