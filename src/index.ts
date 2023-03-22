@@ -39,7 +39,7 @@ app.listen(port, () => {
     const vismaGlobalApi = tenantService?.config?.vismaGlobal?.api;
   
     for (const tenant of tenants) {
-      const fromDate = moment().subtract(1, 'year');
+      const fromDate = moment().subtract(7, 'days');
   
       try {
         messageLog(tenant.user, `-- Start of data sync from ${fromDate.format('DD.MM.YYYY')}`);

@@ -36,7 +36,7 @@ async function loadInitialProductData() {
 
   try {
     messageLog(tenant.user, `-- Start of initial data import`);
-    // await loadProductData(tenant, fromDate);
+    await loadProductData(tenant, fromDate);
 
     const customers = await loadCustomerData(tenant, fromDate);
     const products = await loadProductData(tenant, fromDate);
