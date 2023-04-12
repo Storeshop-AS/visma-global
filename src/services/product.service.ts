@@ -53,7 +53,7 @@ export class ProductService {
          </Article>
        </Articleinfo>`;
 
-    const url = vismaGlobalConfig.api + '/Article.svc/GetArticles';
+    const url = tenant.api + '/Article.svc/GetArticles';
     const filename = `./data/${tenant.user}-${fromDate}-request.xml`;
     fs.writeFileSync(filename, body);
     messageLog(tenant.user, `  POST ${url} (${fromDate})`);
@@ -108,7 +108,7 @@ export class ProductService {
     const _fromDate = fromDate.format('YYYY-MM-DD');
     if (productData?.Articlelist?.Article) {
       for (const article of productData?.Articlelist?.Article) {
-        const IsActive = article?.inactiveyesno?.[0] !== '0';
+        const IsActive = article?.inactiveyesno?.[0] === '0';
         const name = article?.name?.[0] || '';
         const updated = article?.LastUpdate?.[0] || '';
 

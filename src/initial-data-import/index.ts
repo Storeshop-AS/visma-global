@@ -1,4 +1,3 @@
-import { Connection, createConnections, getConnection } from 'typeorm';
 import * as config from 'config';
 import moment from 'moment';
 
@@ -35,12 +34,17 @@ async function loadInitialProductData() {
 
   try {
     messageLog(tenant.user, `-- Start of initial data import`);
-    await loadProductData(tenant, fromDate);
 
     const customers = await loadCustomerData(tenant, fromDate);
-    const products = await loadProductData(tenant, fromDate);
+    messageLog(tenant.user, `Received ${customers && customers.length} customers`);
 
-    tenant.api = tenantService?.config?.vismaGlobal?.api;
+    const products = await loadProductData(tenant, fromDate);
+    // const products = _products.filter((p: any) => {
+    //   return p.ExternalId.match(/E901304-400/);
+    // });
+    console.log(JSON.stringify(products.slice(0, 3), null, ' '));
+    messageLog(tenant.user, `Received ${products && products.length} products`);
+
     const xpResponse = await vismaGlobalUpdateToXp(tenant, customers, products);
     console.log(xpResponse?.data || 'No response found!');
   }

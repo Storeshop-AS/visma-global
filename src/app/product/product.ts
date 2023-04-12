@@ -1,20 +1,8 @@
 import * as fs from 'fs';
 import moment from 'moment';
-import {ProductService, messageLog} from '../../services/index.service';
+import { ProductService, messageLog } from '../../services/index.service';
 
 const xml2js = require('xml2js');
-
-export async function uploadProductsToXp(products: any, tenant: any) {
-  const productService = new ProductService();
-  const uploadResult = await productService.loadProductsToXp(products, tenant)
-    .then((result) => {
-      messageLog(tenant.user, `  Products (${products?.length}) uploaded XP (${result.status})`);
-    })
-    .catch((err) => {
-      messageLog(tenant.user, `  ERROR uploadProductsToXp(): ${err}`);
-    });
-  return uploadResult;
-}
 
 /**
  * @param {any} tenant
@@ -27,33 +15,32 @@ export async function loadProductData(tenant: any, fromDate: moment.Moment) {
   // so we will receive all records for every request.
   // With the updated XP service we will only update records that has actually changed.
 
+  messageLog(tenant.user, `loadProductData(${fromDate.format('DD.MM.YYYY')})`);
   try {
     const _fromDate = fromDate.format('DD.MM.YYYY');
     const productRawData = await productService.getProductsFromVismaGlobalByDateChunk(tenant, _fromDate);
-    if(productRawData) {
-        const filename = `./data/${tenant.user}-products-${_fromDate}.xml`;
-        fs.writeFileSync(filename, productRawData.data);
-        messageLog(tenant.user, `  W ${filename}`);
+    if (productRawData) {
+      const filename = `./data/${tenant.user}-products-${_fromDate}.xml`;
+      fs.writeFileSync(filename, productRawData.data);
+      messageLog(tenant.user, `  W ${filename}`);
 
-        const parser = new xml2js.Parser();
-        const productJsonData = await parser.parseStringPromise(productRawData.data);
-        if(productJsonData) {
-            const jsonFilename = `./data/${tenant.user}-products-${_fromDate}.json`;
-            fs.writeFileSync(jsonFilename, JSON.stringify(productJsonData, null, ' '));
-            messageLog(tenant.user, `  W ${jsonFilename} [${productJsonData?.Articlelist?.Article?.length} products]`);
+      const parser = new xml2js.Parser();
+      const productJsonData = await parser.parseStringPromise(productRawData.data);
+      if(productJsonData) {
+        const jsonFilename = `./data/${tenant.user}-products-${_fromDate}.json`;
+        fs.writeFileSync(jsonFilename, JSON.stringify(productJsonData, null, ' '));
+        messageLog(tenant.user, `  W ${jsonFilename} [${productJsonData?.Articlelist?.Article?.length} products]`);
 
-            // Get formatted products to send to XP
-            const products = productService.getFormattedProducts(tenant, productJsonData, fromDate);
-            
-            const xpFilename = `./data/${tenant.user}-products-xp-${_fromDate}.json`;
-            fs.writeFileSync(xpFilename, JSON.stringify(products, null, ' '));
-            messageLog(tenant.user, `  W ${xpFilename} [${products?.length} products]`);
+        // Get formatted products to send to XP
+        const products = productService.getFormattedProducts(tenant, productJsonData, fromDate);
+          
+        const xpFilename = `./data/${tenant.user}-products-xp-${_fromDate}.json`;
+        fs.writeFileSync(xpFilename, JSON.stringify(products, null, ' '));
+        messageLog(tenant.user, `  W ${xpFilename} [${products?.length} products]`);
 
-            // uploadProductsToXp(products, tenant);
-
-            return products;
-          };
+        return products;
       };
+    };
   }
   catch (error: any) {
     messageLog(tenant.user, 'ERROR products import failed: ' + error);

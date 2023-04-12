@@ -22,8 +22,7 @@
     "gts": "^3.1.0",
     "moment": "^2.29.4",
     "pg": "^8.8.0",
-    "request-promise-native": "^1.0.9",
-    "typeorm": "^0.2.30"
+    "request-promise-native": "^1.0.9"
   },
   "devDependencies": {
     "@types/config": "0.0.34",

@@ -3,16 +3,14 @@
     "baseUrl": "http://localhost:8600/api/visma-global",
     "beBaseUrl": "http://localhost:8181/api"
   },
-  "vismaGlobal": {
-    "api": "http://localhost:8082"
-  },
   "tenants": [
     {
-      "user": "lillehammer",
+      "user": "nansen",
       "password": "tpwcom62020",
       "integration": "visma-global",
-      "clientId": "Kontorleverandøren Lillehammer",
-      "accessToken": "b93b1546-e57d-499c-8320-0d7ff5979552",
+      "api": "https://connect.noroil.as:8082",
+      "clientId": "Noroil Lubricants AS",
+      "accessToken": "dab2f1e5-547a-4cfd-8220-3f95adb19c21",
       "url": "http://localhost:8080/admin/_/service/com.storeshop.app"
     }
   ]

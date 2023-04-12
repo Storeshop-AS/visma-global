@@ -1,11 +1,4 @@
 {
-  "basicConfig": {
-    "baseUrl": "http://localhost:8600/api/visma-global",
-    "beBaseUrl": "http://localhost:8181/api"
-  },
-  "vismaGlobal": {
-    "api": "http://51.107.214.108:8082"
-  },
   "tenants": [
     {
       "user": "nansen",

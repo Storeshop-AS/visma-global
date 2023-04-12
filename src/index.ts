@@ -1,5 +1,4 @@
 import express, { Request, Response } from "express";
-import { Connection, createConnections, getConnection } from "typeorm";
 import * as config from "config";
 import moment from "moment";
 
@@ -36,17 +35,19 @@ app.listen(port, () => {
   async function importProductAndCustomerDaemon() {
     const tenantService = new TenantService();
     const tenants = tenantService.getTenantsByIntegration(INTEGRATIONS.vismaGlobal);
-    const vismaGlobalApi = tenantService?.config?.vismaGlobal?.api;
   
     for (const tenant of tenants) {
-      const fromDate = moment().subtract(7, 'days');
+      const fromDate = moment().subtract(21, 'days');
   
       try {
         messageLog(tenant.user, `-- Start of data sync from ${fromDate.format('DD.MM.YYYY')}`);
-        const customers = await loadCustomerData(tenant, fromDate);
-        const products = await loadProductData(tenant, fromDate);
 
-        tenant.api = vismaGlobalApi;
+        const customers = await loadCustomerData(tenant, fromDate);
+        messageLog(tenant.user, `Received ${customers && customers.length} customers`);
+
+        const products = await loadProductData(tenant, fromDate);
+        messageLog(tenant.user, `Received ${products && products.length} products`);
+
         const xpResponse = await vismaGlobalUpdateToXp(tenant, customers.slice(0, 1000), products.slice(0, 1000));
         console.log(xpResponse?.data || 'No response found!');
       }
