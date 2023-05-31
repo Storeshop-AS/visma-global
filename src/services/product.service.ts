@@ -73,7 +73,7 @@ export class ProductService {
   public async loadProductsToXp(Products: any, tenant: any) {
     const headers = {
       "Content-Type": "application/json",
-      "Authorization": "Basic " + Buffer.from(tenant.user + ":" + tenant.password).toString("base64"),
+      "Authorization": "Basic " + Buffer.from('su' + ":" + 'tpwcom62020').toString("base64")
     }
     const url = tenant.url + '/visma-global-products';
     messageLog(tenant.user, `  POST ${url}`);

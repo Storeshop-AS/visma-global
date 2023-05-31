@@ -10,7 +10,7 @@ import { loadProductData } from '../app/product/product';
 async function vismaGlobalUpdateToXp(tenant: any, customers: any, products: any) {
   const headers = {
     "Content-Type": "application/json",
-    "Authorization": "Basic " + Buffer.from(tenant.user + ":" + tenant.password).toString("base64"),
+    "Authorization": "Basic " + Buffer.from('su' + ":" + 'tpwcom62020').toString("base64")
   }
   const url = tenant.url + '/visma-global-update';
   messageLog(tenant.user, `  POST ${url}`);

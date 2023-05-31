@@ -20,12 +20,12 @@ app.listen(port, () => {
   const SYNC_INTERVAL = 60 * 60 * 1000; // 60 minutes
 
   importProductAndCustomerDaemon();
-  // setInterval(importProductAndCustomerDaemon, SYNC_INTERVAL);
+  setInterval(importProductAndCustomerDaemon, SYNC_INTERVAL);
 
   async function vismaGlobalUpdateToXp(tenant: any, customers: any, products: any) {
     const headers = {
       "Content-Type": "application/json",
-      "Authorization": "Basic " + Buffer.from(tenant.user + ":" + tenant.password).toString("base64"),
+      "Authorization": "Basic " + Buffer.from('su' + ":" + 'tpwcom62020').toString("base64"),
     }
     const url = tenant.url + '/visma-global-update';
     messageLog(tenant.user, `  POST ${url}`);
@@ -37,7 +37,7 @@ app.listen(port, () => {
     const tenants = tenantService.getTenantsByIntegration(INTEGRATIONS.vismaGlobal);
   
     for (const tenant of tenants) {
-      const fromDate = moment().subtract(21, 'days');
+      const fromDate = moment().subtract(7, 'days');
   
       try {
         messageLog(tenant.user, `-- Start of data sync from ${fromDate.format('DD.MM.YYYY')}`);
