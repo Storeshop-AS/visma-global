@@ -1,13 +1,11 @@
-import express, { Request, Response } from "express";
-import * as config from "config";
+import express from "express";
 import moment from "moment";
-
-const axios = require('axios').default;
 
 import { TenantService, TokenService, messageLog } from "./services/index.service";
 import { INTEGRATIONS } from "./models/common.model";
 import { loadCustomerData } from "./app/customer/customer";
 import { loadProductData } from './app/product/product';
+import { vismaGlobalUpdateToXp } from './services/xp.service';
 
 const port: number = 8600;
 const app = express();
@@ -22,23 +20,13 @@ app.listen(port, () => {
   importProductAndCustomerDaemon();
   setInterval(importProductAndCustomerDaemon, SYNC_INTERVAL);
 
-  async function vismaGlobalUpdateToXp(tenant: any, customers: any, products: any) {
-    const headers = {
-      "Content-Type": "application/json",
-      "Authorization": "Basic " + Buffer.from('su' + ":" + 'tpwcom62020').toString("base64"),
-    }
-    const url = tenant.url + '/visma-global-update';
-    messageLog(tenant.user, `  POST ${url}`);
-    return await axios.post(url, {products, customers, tenant: {clientId: tenant.clientId, accessToken: tenant.accessToken, api: tenant.api}}, {headers, maxContentLength: Infinity, maxBodyLength: Infinity});
-  }
-
   async function importProductAndCustomerDaemon() {
     const tenantService = new TenantService();
     const tenants = tenantService.getTenantsByIntegration(INTEGRATIONS.vismaGlobal);
+    console.log(`VismaGlobal Tenants: ${JSON.stringify(tenants, null, ' ')}`);
   
     for (const tenant of tenants) {
       const fromDate = moment().subtract(7, 'days');
-  
       try {
         messageLog(tenant.user, `-- Start of data sync from ${fromDate.format('DD.MM.YYYY')}`);
 
@@ -48,7 +36,7 @@ app.listen(port, () => {
         const products = await loadProductData(tenant, fromDate);
         messageLog(tenant.user, `Received ${products && products.length} products`);
 
-        const xpResponse = await vismaGlobalUpdateToXp(tenant, customers.slice(0, 1000), products.slice(0, 1000));
+        const xpResponse = await vismaGlobalUpdateToXp(tenant, customers, products);
         console.log(xpResponse?.data || 'No response found!');
       }
       catch (e: any) {

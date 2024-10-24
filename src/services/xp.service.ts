@@ -1,14 +1,15 @@
 const axios = require('axios').default;
 
-const json = true
+import { messageLog } from '../services/index.service';
 
-function saveArticle(body: any, path: string, headers: any) {
-  const url = `${path}/product`;
-  return axios.post(url, body, { headers });
-}
-function saveCustomer(body: any, path: string, headers: any) {
-  const url = `${path}/customer`;
-  return axios.post(url, body, { headers });
-}
+export async function vismaGlobalUpdateToXp(tenant: any, customers: any, products: any) {
+  const headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Basic " + Buffer.from('su' + ":" + 'tpwcom62020').toString("base64")
+  }
 
-export { saveArticle, saveCustomer };
+  const url = tenant.url + '/visma-global-update';
+  messageLog(tenant.user, `  POST ${url}`);
+
+  return await axios.post(url, {products, customers, tenant: {clientId: tenant.clientId, accessToken: tenant.accessToken, api: tenant.api}}, {headers, maxContentLength: Infinity, maxBodyLength: Infinity});
+}

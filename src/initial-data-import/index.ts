@@ -1,21 +1,9 @@
-import * as config from 'config';
 import moment from 'moment';
-
-const axios = require('axios').default;
 
 import { TenantService, messageLog } from '../services/index.service';
 import { loadCustomerData } from '../app/customer/customer';
 import { loadProductData } from '../app/product/product';
-
-async function vismaGlobalUpdateToXp(tenant: any, customers: any, products: any) {
-  const headers = {
-    "Content-Type": "application/json",
-    "Authorization": "Basic " + Buffer.from('su' + ":" + 'tpwcom62020').toString("base64")
-  }
-  const url = tenant.url + '/visma-global-update';
-  messageLog(tenant.user, `  POST ${url}`);
-  return await axios.post(url, {products, customers, tenant: {clientId: tenant.clientId, accessToken: tenant.accessToken, api: tenant.api}}, {headers, maxContentLength: Infinity, maxBodyLength: Infinity});
-}
+import { vismaGlobalUpdateToXp } from '../services/xp.service'
 
 async function loadInitialProductData() {
   if (!process.env.npm_config_user) {
