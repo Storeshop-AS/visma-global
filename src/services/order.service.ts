@@ -1,8 +1,5 @@
 import * as config from "config";
 
-import { Order } from '../entity/order'
-import { Orderline } from '../entity/orderline'
-
 const axios = require('axios').default;
 
 export class OrderService {
@@ -12,7 +9,7 @@ export class OrderService {
         this.config = config;
     }
 
-    public orderDataTransformation(order: Order, lines: Orderline[]) {
+    public orderDataTransformation(order: any, lines: any) {
         const linesData = [];
         for (const line of lines) {
             linesData.push({
