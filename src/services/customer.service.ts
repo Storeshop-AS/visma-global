@@ -69,7 +69,7 @@ export class CustomerService {
     const config = {
       headers: {'Content-Type': 'text/xml', Accept: 'application/xml'}
     };
-  
+    axios.defaults.timeout = 380000; // Set default timeout to 5 seconds
     return axios.post(url, body, config);
   }
 

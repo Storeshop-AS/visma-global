@@ -33,8 +33,11 @@ app.listen(port, () => {
   }
 
   async function importProductAndCustomerDaemon() {
+    console.log('--- importProductAndCustomerDaemon() called ---');
+    let products;
     const tenantService = new TenantService();
     const tenants = tenantService.getTenantsByIntegration(INTEGRATIONS.vismaGlobal);
+    console.log(`tenants: ${JSON.stringify(tenants, null, ' ')}`);
   
     for (const tenant of tenants) {
       const fromDate = moment().subtract(7, 'days');
@@ -42,13 +45,14 @@ app.listen(port, () => {
       try {
         messageLog(tenant.user, `-- Start of data sync from ${fromDate.format('DD.MM.YYYY')}`);
 
+        products = await loadProductData(tenant, fromDate);
+        messageLog(tenant.user, `Received ${products && products.length} products`);
+
         const customers = await loadCustomerData(tenant, fromDate);
         messageLog(tenant.user, `Received ${customers && customers.length} customers`);
 
-        const products = await loadProductData(tenant, fromDate);
-        messageLog(tenant.user, `Received ${products && products.length} products`);
-
-        const xpResponse = await vismaGlobalUpdateToXp(tenant, customers.slice(0, 1000), products.slice(0, 1000));
+        const xpResponse = await vismaGlobalUpdateToXp(tenant, customers && customers.slice(0, 1000) || [], products && products.slice(0, 1000) || []);
+        // const xpResponse = await vismaGlobalUpdateToXp(tenant, [], products && products.slice(0, 1000) || []);
         console.log(xpResponse?.data || 'No response found!');
       }
       catch (e: any) {
