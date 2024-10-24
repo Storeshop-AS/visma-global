@@ -1,12 +1,12 @@
 [
   {
-    "name": "lillehammer",
+    "name": "halden",
     "type": "postgres",
     "host": "localhost",
     "port": 5432,
     "username": "postgres",
     "password": "secret",
-    "database": "lillehammer",
+    "database": "halden",
     "synchronize": true,
     "entities": ["src/entity/**/*.ts"],
     "migrations": ["src/migration/**/*.ts"],
