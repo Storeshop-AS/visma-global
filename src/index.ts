@@ -1,7 +1,7 @@
 import express from "express";
 import moment from "moment";
 
-import { TenantService, TokenService, messageLog } from "./services/index.service";
+import { TenantService, messageLog } from "./services/index.service";
 import { INTEGRATIONS } from "./models/common.model";
 import { loadCustomerData } from "./app/customer/customer";
 import { loadProductData } from './app/product/product';

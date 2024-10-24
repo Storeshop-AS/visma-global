@@ -23,6 +23,7 @@ export class ProductService {
     */
   public getProductsFromVismaGlobalByDateChunk(tenant: any, fromDate: string) {
     const vismaGlobalConfig: any = this.config.vismaGlobal;
+    console.log(`config data: ${JSON.stringify(this.config, null, ' ')}`);
 
     const body = `<?xml version="1.0" encoding="UTF-8" ?>
        <Articleinfo>
@@ -46,7 +47,7 @@ export class ProductService {
          <StartDateOfferPrice></StartDateOfferPrice>
          <StopDateOfferPrice></StopDateOfferPrice>
          <inactiveyesno></inactiveyesno>
-         <LastUpdate>&gt;${fromDate}</LastUpdate>
+         <LastUpdate>${fromDate}</LastUpdate>
          <StockSurvey.WarehouseNo></StockSurvey.WarehouseNo>
          <StockSurvey.UnitInStock></StockSurvey.UnitInStock>
          <StockSurvey.Available></StockSurvey.Available>
@@ -55,6 +56,7 @@ export class ProductService {
 
     const url = tenant.api + '/Article.svc/GetArticles';
     const filename = `./data/${tenant.user}-${fromDate}-request.xml`;
+    console.log(`api body of vismal: `, body);
     fs.writeFileSync(filename, body);
     messageLog(tenant.user, `  POST ${url} (${fromDate})`);
     messageLog(tenant.user, `  W ${filename}`);

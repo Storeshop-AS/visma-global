@@ -36,7 +36,11 @@ export async function loadCustomerData(tenant: any, fromDate: moment.Moment) {
         messageLog(tenant.user, `  W ${xpFilename} [${customers?.length} customers]`);
   
         return customers;
-      };
+      }
+      else {
+        messageLog(tenant.user, `  **** No data`);
+	console.log(JSON.stringify(customerRawData, null, ' '));
+      }
     };
   }
   catch(error: any) {
