@@ -43,7 +43,7 @@ export async function loadCustomerData(tenant: any, fromDate: moment.Moment) {
                 Name: customer.name,
               });
             }
-            customer.push({
+            customers.push({
               ...customer,
               discounts: discounts || [],
             })
