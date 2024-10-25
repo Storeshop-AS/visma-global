@@ -18,15 +18,8 @@ export async function loadDiscountData(tenant: any, customerNo: any, fromDate: m
       const parser = new xml2js.Parser();
       const discountJsonData = await parser.parseStringPromise(discountRawData.data);
       if(discountJsonData && discountJsonData?.PriceMatrix && discountJsonData?.PriceMatrix?.Prices) {
-        const jsonFilename = `./data/${tenant.user}-discounts-${customerNo}.json`;
-        fs.writeFileSync(jsonFilename, JSON.stringify(discountJsonData, null, ' '));
-
-        messageLog(tenant.user, `  W ${jsonFilename} [${discountJsonData?.PriceMatrix?.Prices?.Price?.length} discounts]`);
-
-        // Get formatted discounts to send to XP
         return discountService.getFormattedDiscounts(discountJsonData, fromDate);
       }
-      return [];
     }
   }
   catch (error: any) {

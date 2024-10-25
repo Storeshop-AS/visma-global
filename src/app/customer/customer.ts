@@ -30,17 +30,20 @@ export async function loadCustomerData(tenant: any, fromDate: moment.Moment) {
         messageLog(tenant.user, `  W ${jsonFilename} [${customerJsonData?.Customerlist?.Customer?.length} customers]`);
   
         // Get formatted customers to send to XP
-        const customers = customerService.getFormattedCustomers(customerJsonData);
+        const formattedCustomers = customerService.getFormattedCustomers(customerJsonData);
 
-        if (customers.length > 0) {
-          customers.map(async (customer: any) => {
+        const customers: any = [];
+        if (formattedCustomers.length > 0) {
+          formattedCustomers.forEach(async (customer: any) => {
             const discounts = await loadDiscountData(tenant, customer.Id, fromDate);
-            customer.discounts = discounts || [];
             if (discounts) {
               const jsonFilename2 = `./data/${tenant.user}-customer-${customer.Id}.json`;
               fs.writeFileSync(jsonFilename2, JSON.stringify(customer, null, ' '));
             }
-            return customer;
+            customer.push({
+              ...customer,
+              discounts: discounts || [],
+            })
           });
         }
 
