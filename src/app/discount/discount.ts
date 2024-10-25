@@ -21,7 +21,7 @@ export async function loadDiscountData(tenant: any, customerNo: any, fromDate: m
 
       const parser = new xml2js.Parser();
       const discountJsonData = await parser.parseStringPromise(discountRawData.data);
-      if(discountJsonData) {
+      if(discountJsonData && discountJsonData?.PriceMatrix && discountJsonData?.PriceMatrix?.Prices) {
         const jsonFilename = `./data/${tenant.user}-discounts-${customerNo}.json`;
         fs.writeFileSync(jsonFilename, JSON.stringify(discountJsonData, null, ' '));
 
@@ -29,9 +29,9 @@ export async function loadDiscountData(tenant: any, customerNo: any, fromDate: m
 
         // Get formatted discounts to send to XP
         return discountService.getFormattedDiscounts(discountJsonData, fromDate);
-      };
+      }
       return [];
-    };
+    }
   }
   catch (error: any) {
     messageLog(tenant.user, 'ERROR discounts import failed: ' + error);

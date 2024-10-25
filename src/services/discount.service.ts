@@ -1,7 +1,6 @@
 import moment from 'moment';
 
 import * as config from 'config';
-import { messageLog } from './index.service';
 
 const axios = require('axios'); //.default;
 
@@ -15,10 +14,6 @@ export class DiscountService {
     this.config = config;
   }
 
-  /**
-    * @param  {any} tenant
-    * @returns { * }
-    */
   public getPriceDiscounts(tenant: any, customerNo: any) {
     const body = `<?xml version="1.0" encoding="UTF-8" ?>
       <PriceMatrix>
@@ -38,43 +33,6 @@ export class DiscountService {
     };
 
     return axios.post(url, body, config);
-  }
-
-  /**
-   * @param  {any} discounts that need to transform
-   * @param  {any} tenant
-   */
-  public async loaddiscountsToXp(discounts: any, tenant: any) {
-    const headers = {
-      "Content-Type": "application/json",
-      "Authorization": "Basic " + Buffer.from('su' + ":" + 'tpwcom62020').toString("base64")
-    }
-    const url = tenant.url + '/visma-global-discounts';
-    messageLog(tenant.user, `  POST ${url}`);
-    return await axios.post(url, discounts, {headers, maxContentLength: Infinity, maxBodyLength: Infinity});
-  }
-
-  public articleToXpProduct(discountData: any): any {
-    let discounts = [];
-    if (discountData?.Articlelist?.Article) {
-      for (const article of discountData.Articlelist.Article) {
-        const product = {
-          displayName: article?.name?.[0],
-          data: {
-            ExternalId: article?.articleid?.[0] || '',
-            price: parseFloat(article?.price1?.[0] || 0),
-            stock: parseInt(article['StockSurvey.Available']?.[0] || 0, 10),
-            accountingLastChanged: article.LastUpdate?.[0],
-            IsActive: article?.inactiveyesno?.[0] === '0'
-          }
-        };
-        if (product.data.IsActive) {
-          discounts.push(product);
-        }
-      }
-    }
-
-    return discounts;
   }
 
   public getFormattedDiscounts(discountData: any, fromDate: moment.Moment): any {
