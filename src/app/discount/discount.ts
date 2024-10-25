@@ -12,18 +12,14 @@ const xml2js = require('xml2js');
 export async function loadDiscountData(tenant: any, customerNo: any, fromDate: moment.Moment) {
   const discountService = new DiscountService();
 
-  try {
-    const discountRawData = await discountService.getPriceDiscounts(tenant, customerNo);
-    if (discountRawData) {
-      const parser = new xml2js.Parser();
-      const discountJsonData = await parser.parseStringPromise(discountRawData.data);
-      console.log(`discountJsonData: `, JSON.stringify(discountJsonData, null, ' '));
-      if(discountJsonData && discountJsonData?.PriceMatrix && discountJsonData?.PriceMatrix?.Prices) {
-        return discountService.getFormattedDiscounts(discountJsonData, fromDate);
-      }
+  const discountRawData = await discountService.getPriceDiscounts(tenant, customerNo);
+  console.log(`discountRawData: `, JSON.stringify(discountRawData, null, ' '));
+  if (discountRawData) {
+    const parser = new xml2js.Parser();
+    const discountJsonData = await parser.parseStringPromise(discountRawData.data);
+    console.log(`discountJsonData: `, JSON.stringify(discountJsonData, null, ' '));
+    if(discountJsonData && discountJsonData?.PriceMatrix && discountJsonData?.PriceMatrix?.Prices) {
+      return discountService.getFormattedDiscounts(discountJsonData, fromDate);
     }
   }
-  catch (error: any) {
-    messageLog(tenant.user, 'ERROR discounts import failed: ' + error);
-  }   
 }
