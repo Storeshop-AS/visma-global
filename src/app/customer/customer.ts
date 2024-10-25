@@ -38,6 +38,7 @@ export async function loadCustomerData(tenant: any, fromDate: moment.Moment) {
           formattedCustomers.forEach(async (customer: any) => {
             const discounts = await loadDiscountData(tenant, customer.Id, fromDate);
             if (discounts) {
+              console.log(`discounts: `, JSON.stringify(discounts,  null, ' '));
               discountForCustomers.push({
                 Id: customer.Id,
                 Name: customer.name,
@@ -49,6 +50,7 @@ export async function loadCustomerData(tenant: any, fromDate: moment.Moment) {
             })
           });
         }
+        console.log(`discountForCustomers: `, JSON.stringify(discountForCustomers,  null, ' '));
 
         const dfcFilename = `./data/${tenant.user}-discount-for-customers-${_fromDate}.json`;
         fs.writeFileSync(dfcFilename, JSON.stringify(discountForCustomers, null, ' '));
