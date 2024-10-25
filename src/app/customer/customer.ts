@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import moment from 'moment';
 import { CustomerService, messageLog } from '../../services/index.service';
+import { loadDiscountData } from '../discount/discount';
 
 const xml2js = require('xml2js');
 
@@ -30,6 +31,14 @@ export async function loadCustomerData(tenant: any, fromDate: moment.Moment) {
   
         // Get formatted customers to send to XP
         const customers = customerService.getFormattedCustomers(customerJsonData);
+
+        if (customers.length > 0) {
+          customers.map(async (customer: any) => {
+            const discounts = await loadDiscountData(tenant, customer.Id, fromDate);
+            customer.discounts = discounts || [];
+            return customer;
+          });
+        }
 
         const xpFilename = `./data/${tenant.user}-customers-xp-${_fromDate}.json`;
         fs.writeFileSync(xpFilename, JSON.stringify(customers, null, ' '));
