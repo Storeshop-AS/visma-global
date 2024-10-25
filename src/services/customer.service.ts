@@ -56,7 +56,6 @@ export class CustomerService {
           <VisitPostCode/>
           <VisitPostalArea/>
           <ChangedDate/>
-          <CustomerGrpNo/>
         </Customer>
       </Customerinfo>`;
 

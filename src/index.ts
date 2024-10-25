@@ -5,6 +5,7 @@ import { TenantService, messageLog } from "./services/index.service";
 import { INTEGRATIONS } from "./models/common.model";
 import { loadCustomerData } from "./app/customer/customer";
 import { loadProductData } from './app/product/product';
+import { loadDiscountData } from './app/discount/discount';
 import { vismaGlobalUpdateToXp } from './services/xp.service';
 
 const port: number = 8600;
@@ -29,6 +30,9 @@ app.listen(port, () => {
       const fromDate = moment().subtract(7, 'days');
       try {
         messageLog(tenant.user, `-- Start of data sync from ${fromDate.format('DD.MM.YYYY')}`);
+
+        const discounts = await loadDiscountData(tenant, fromDate);
+        messageLog(tenant.user, `Received ${discounts && discounts.length} discounts`);
 
         const customers = await loadCustomerData(tenant, fromDate);
         messageLog(tenant.user, `Received ${customers && customers.length} customers`);
