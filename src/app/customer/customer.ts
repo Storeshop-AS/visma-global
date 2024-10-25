@@ -36,6 +36,10 @@ export async function loadCustomerData(tenant: any, fromDate: moment.Moment) {
           customers.map(async (customer: any) => {
             const discounts = await loadDiscountData(tenant, customer.Id, fromDate);
             customer.discounts = discounts || [];
+            if (discounts) {
+              const jsonFilename2 = `./data/${tenant.user}-customer-${customer.Id}.json`;
+              fs.writeFileSync(jsonFilename2, JSON.stringify(customer, null, ' '));
+            }
             return customer;
           });
         }
