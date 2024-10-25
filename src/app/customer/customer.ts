@@ -37,7 +37,7 @@ export async function loadCustomerData(tenant: any, fromDate: moment.Moment) {
         if (formattedCustomers.length > 0) {
           for (const customer of formattedCustomers) {
             const discounts = await loadDiscountData(tenant, customer.Id, fromDate);
-            if (discounts) {
+            if (discounts && discounts.length > 0) {
               console.log(`discounts: `, JSON.stringify(discounts, null, ' '));
               discountForCustomers.push({
                 Id: customer.Id,
