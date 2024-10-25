@@ -26,6 +26,10 @@ export class DiscountService {
           <Clientid>${tenant.clientId}</Clientid>
           <Token>${tenant.accessToken}</Token>
         </ClientInfo>
+        <Filter>
+          <customerNo></customerNo>
+          <lastUpdate></lastUpdate>
+        </Filter>
       </PriceMatrix>`;
 
     const url = tenant.api + '/Extension.svc/GetPriceMatrix';
