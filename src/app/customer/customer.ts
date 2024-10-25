@@ -33,12 +33,15 @@ export async function loadCustomerData(tenant: any, fromDate: moment.Moment) {
         const formattedCustomers = customerService.getFormattedCustomers(customerJsonData);
 
         const customers: any = [];
+        const discountForCustomers: any = [];
         if (formattedCustomers.length > 0) {
           formattedCustomers.forEach(async (customer: any) => {
             const discounts = await loadDiscountData(tenant, customer.Id, fromDate);
             if (discounts) {
-              const jsonFilename2 = `./data/${tenant.user}-customer-${customer.Id}.json`;
-              fs.writeFileSync(jsonFilename2, JSON.stringify(customer, null, ' '));
+              discountForCustomers.push({
+                Id: customer.Id,
+                Name: customer.name,
+              });
             }
             customer.push({
               ...customer,
@@ -46,6 +49,9 @@ export async function loadCustomerData(tenant: any, fromDate: moment.Moment) {
             })
           });
         }
+
+        const dfcFilename = `./data/${tenant.user}-discount-for-customers-${_fromDate}.json`;
+        fs.writeFileSync(dfcFilename, JSON.stringify(discountForCustomers, null, ' '));
 
         const xpFilename = `./data/${tenant.user}-customers-xp-${_fromDate}.json`;
         fs.writeFileSync(xpFilename, JSON.stringify(customers, null, ' '));
@@ -55,7 +61,7 @@ export async function loadCustomerData(tenant: any, fromDate: moment.Moment) {
       }
       else {
         messageLog(tenant.user, `  **** No data`);
-	console.log(JSON.stringify(customerRawData, null, ' '));
+	      console.log(JSON.stringify(customerRawData, null, ' '));
       }
     };
   }
