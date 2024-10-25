@@ -35,10 +35,10 @@ export async function loadCustomerData(tenant: any, fromDate: moment.Moment) {
         const customers: any = [];
         const discountForCustomers: any = [];
         if (formattedCustomers.length > 0) {
-          formattedCustomers.forEach(async (customer: any) => {
+          for (const customer of formattedCustomers) {
             const discounts = await loadDiscountData(tenant, customer.Id, fromDate);
             if (discounts) {
-              console.log(`discounts: `, JSON.stringify(discounts,  null, ' '));
+              console.log(`discounts: `, JSON.stringify(discounts, null, ' '));
               discountForCustomers.push({
                 Id: customer.Id,
                 Name: customer.name,
@@ -46,9 +46,9 @@ export async function loadCustomerData(tenant: any, fromDate: moment.Moment) {
             }
             customers.push({
               ...customer,
-              discounts: [],
-            })
-          });
+              discounts: discounts || [],
+            });
+          }
         }
         console.log(`discountForCustomers: `, JSON.stringify(discountForCustomers,  null, ' '));
 
