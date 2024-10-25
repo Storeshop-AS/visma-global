@@ -25,6 +25,8 @@ async function loadInitialProductData() {
 
     const customers = await loadCustomerData(tenant, fromDate);
     messageLog(tenant.user, `Received ${customers && customers.length} customers`);
+    console.log(`customers: `, JSON.stringify(customers, null, ' '));
+    return;
 
     const products = await loadProductData(tenant, fromDate);
     // const products = _products.filter((p: any) => {
