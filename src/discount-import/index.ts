@@ -22,6 +22,9 @@ async function handleCustomer(tenant: any, fromDate: any, i = 0) {
         handleCustomer(tenant, fromDate, i+1);
       }
     }
+    else {
+      handleCustomer(tenant, fromDate, i+1);
+    }
   }
 } 
 
