@@ -15,7 +15,7 @@ export class DiscountService {
   }
 
   public getPriceDiscounts(tenant: any, customerNo: any) {
-    const body = `<?xml version="1.0" encoding="UTF-8" ?>
+    const body: any = `<?xml version="1.0" encoding="UTF-8" ?>
       <PriceMatrix>
         <ClientInfo>
           <Clientid>${tenant.clientId}</Clientid>
@@ -31,6 +31,8 @@ export class DiscountService {
     const config = {
       headers: {'Content-Type': 'text/xml', Accept: 'application/xml'}
     };
+
+    console.log(`getPriceDiscounts() API Body: `, body);
 
     return axios.post(url, body, config);
   }

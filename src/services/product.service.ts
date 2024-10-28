@@ -22,7 +22,6 @@ export class ProductService {
     * @returns { * }
     */
   public getProductsFromVismaGlobalByDateChunk(tenant: any, fromDate: string) {
-    const vismaGlobalConfig: any = this.config.vismaGlobal;
     console.log(`config data: ${JSON.stringify(this.config, null, ' ')}`);
 
     const body = `<?xml version="1.0" encoding="UTF-8" ?>
