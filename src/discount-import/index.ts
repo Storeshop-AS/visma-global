@@ -12,6 +12,7 @@ function delay(ms: number) {
 
 async function handleCustomer(tenant: any, fromDate: any, i = 0) {
   const customerId = customers[i];
+  console.log(`customerId: `, JSON.stringify(customerId, null, ' '));
   if (customerId) {
     const discounts = await loadDiscountData(tenant, customerId, fromDate);
     if (discounts && discounts.length > 0) {
@@ -37,6 +38,7 @@ async function syncDiscount() {
   const tenantService = new TenantService();
   const tenant = tenantService.getTenantByUser(process.env.npm_config_user as string);
   const fromDate = moment().subtract(3, 'years');
+  console.log(`tenant: `, JSON.stringify(tenant, null, ' '));
 
   if (!tenant) {
     messageLog(process.env.npm_config_user, 'Tenant not found in config');
