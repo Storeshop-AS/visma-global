@@ -18,8 +18,8 @@ async function handleCustomer(tenant: any, fromDate: any, i = 0) {
     const discounts = await loadDiscountData(tenant, customerId, fromDate);
     if (discounts && discounts.length > 0) {
       console.log(`discounts: `, JSON.stringify(discounts, null, ' '));
-      // const xpResponse = await vismaGlobalDiscountUpdateToXp(tenant, discounts);
-      // console.log(xpResponse?.data || 'No response found!');
+      const xpResponse = await vismaGlobalDiscountUpdateToXp(tenant, discounts);
+      console.log(xpResponse?.data || 'No response found!');
       // if (xpResponse?.data) {
       //   // handleCustomer(tenant, fromDate, i+1);
       // }
