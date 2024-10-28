@@ -17,7 +17,7 @@ export async function loadDiscountData(tenant: any, customerNo: any, fromDate: m
       const parser = new xml2js.Parser();
       const discountJsonData = await parser.parseStringPromise(discountRawData.data);
       if(discountJsonData && discountJsonData?.PriceMatrix && discountJsonData?.PriceMatrix?.Prices) {
-        console.log(`discountJsonData 2222: `, JSON.stringify(discountJsonData?.PriceMatrix?.Prices, null, ' '));
+        console.log(`discountJsonData 33333: `, JSON.stringify(discountJsonData?.PriceMatrix?.Prices[0], null, ' '));
         return discountService.getFormattedDiscounts(discountJsonData, fromDate);
       }
     }

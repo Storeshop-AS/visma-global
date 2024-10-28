@@ -38,8 +38,8 @@ export class DiscountService {
   public getFormattedDiscounts(discountData: any, fromDate: moment.Moment): any {
     let discounts = [];
     const _fromDate = fromDate.format('YYYY-MM-DD');
-    if (discountData?.PriceMatrix?.Prices?.Price) {
-      for (const discount of discountData?.PriceMatrix?.Prices?.Price) {
+    if (discountData?.PriceMatrix?.Prices) {
+      for (const discount of discountData?.PriceMatrix?.Prices[0]?.Price) {
         const currentDate = new Date();
         const updated = discount?.LastUpdate?.[0] || '';
         const stopDate = new Date(discount?.StopDate?.[0] || '');
