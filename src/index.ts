@@ -1,3 +1,4 @@
+import * as http from "http";
 import express from "express";
 import moment from "moment";
 
@@ -7,12 +8,16 @@ import { loadCustomerData } from "./app/customer/customer";
 import { loadProductData } from './app/product/product';
 import { vismaGlobalUpdateToXp } from './services/xp.service';
 
+import { ApiController } from "./api";
+
 const port: number = 8600;
 const app = express();
 app.use(express.json());
 
-app.listen(port, () => {
-  console.log("Server Started at Port, " + port);
+app.use("/api", ApiController);
+
+http.createServer(app).listen(port, () => {
+  console.log(`Listening at http://localhost:${port}/`);
 
   // This scheduler will run in every 1 hour min for extract data from visma global and load to XP
   const SYNC_INTERVAL = 60 * 60 * 1000; // 60 minutes
@@ -44,4 +49,4 @@ app.listen(port, () => {
       }
     }
   }
-})
+});

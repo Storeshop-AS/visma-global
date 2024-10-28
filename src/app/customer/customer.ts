@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import moment from 'moment';
 import { CustomerService, messageLog } from '../../services/index.service';
-import { loadDiscountData } from '../discount/discount';
 
 const xml2js = require('xml2js');
 
@@ -32,34 +31,11 @@ export async function loadCustomerData(tenant: any, fromDate: moment.Moment) {
         // Get formatted customers to send to XP
         const formattedCustomers = customerService.getFormattedCustomers(customerJsonData);
 
-        const customers: any = [];
-        const discountForCustomers: any = [];
-        if (formattedCustomers.length > 0) {
-          for (const customer of formattedCustomers) {
-            const discounts = await loadDiscountData(tenant, customer.Id, fromDate);
-            if (discounts && discounts.length > 0) {
-              console.log(`discounts: `, JSON.stringify(discounts, null, ' '));
-              discountForCustomers.push({
-                Id: customer.Id,
-                Name: customer.name,
-              });
-            }
-            customers.push({
-              ...customer,
-              discounts: discounts || [],
-            });
-          }
-        }
-        console.log(`discountForCustomers: `, JSON.stringify(discountForCustomers,  null, ' '));
-
-        const dfcFilename = `./data/${tenant.user}-discount-for-customers-${_fromDate}.json`;
-        fs.writeFileSync(dfcFilename, JSON.stringify(discountForCustomers, null, ' '));
-
         const xpFilename = `./data/${tenant.user}-customers-xp-${_fromDate}.json`;
-        fs.writeFileSync(xpFilename, JSON.stringify(customers, null, ' '));
-        messageLog(tenant.user, `  W ${xpFilename} [${customers?.length} customers]`);
+        fs.writeFileSync(xpFilename, JSON.stringify(formattedCustomers, null, ' '));
+        messageLog(tenant.user, `  W ${xpFilename} [${formattedCustomers?.length} customers]`);
   
-        return customers;
+        return formattedCustomers;
       }
       else {
         messageLog(tenant.user, `  **** No data`);
