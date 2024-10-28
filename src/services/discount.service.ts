@@ -32,8 +32,6 @@ export class DiscountService {
       headers: {'Content-Type': 'text/xml', Accept: 'application/xml'}
     };
 
-    console.log(`getPriceDiscounts() API Body: `, body);
-
     return axios.post(url, body, config);
   }
 
