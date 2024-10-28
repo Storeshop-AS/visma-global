@@ -11,20 +11,21 @@ function delay(ms: number) {
 }
 
 async function handleCustomer(tenant: any, fromDate: any, i = 0) {
-  const customerId = customers[i];
+  // const customerId = customers[i];
+  const customerId = '12262';
   console.log(`customerId: `, JSON.stringify(customerId, null, ' '));
   if (customerId) {
     const discounts = await loadDiscountData(tenant, customerId, fromDate);
     if (discounts && discounts.length > 0) {
       console.log(`discounts: `, JSON.stringify(discounts, null, ' '));
-      const xpResponse = await vismaGlobalDiscountUpdateToXp(tenant, discounts);
-      console.log(xpResponse?.data || 'No response found!');
-      if (xpResponse?.data) {
-        handleCustomer(tenant, fromDate, i+1);
-      }
+      // const xpResponse = await vismaGlobalDiscountUpdateToXp(tenant, discounts);
+      // console.log(xpResponse?.data || 'No response found!');
+      // if (xpResponse?.data) {
+      //   // handleCustomer(tenant, fromDate, i+1);
+      // }
     }
     else {
-      handleCustomer(tenant, fromDate, i+1);
+      // handleCustomer(tenant, fromDate, i+1);
     }
   }
 } 
