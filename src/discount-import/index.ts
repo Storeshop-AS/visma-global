@@ -11,7 +11,7 @@ function delay(ms: number) {
 }
 
 async function handleCustomer(tenant: any, fromDate: any, i = 0) {
-  const customerId = customers[i];
+  const customerId = customers[i] || false;
   // const customerId = '12262';
   if (customerId) {
     const discounts = await loadDiscountData(tenant, customerId, fromDate);
@@ -20,11 +20,11 @@ async function handleCustomer(tenant: any, fromDate: any, i = 0) {
       const xpResponse = await vismaGlobalDiscountUpdateToXp(tenant, discounts);
       console.log(xpResponse?.data || 'No response found!');
       if (xpResponse?.data) {
-        handleCustomer(tenant, fromDate, i+1);
+        await handleCustomer(tenant, fromDate, i+1);
       }
     }
     else {
-      handleCustomer(tenant, fromDate, i+1);
+      await handleCustomer(tenant, fromDate, i+1);
     }
   }
 } 
