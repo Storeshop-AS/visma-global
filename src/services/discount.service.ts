@@ -47,7 +47,7 @@ export class DiscountService {
         if (updated > _fromDate && stopDate >= currentDate) {
           discounts.push({
             discountType: discount?.DiscountType?.[0] || '',
-            dustomerNo: discount?.CustomerNo?.[0] || '',
+            customerNo: discount?.CustomerNo?.[0] || '',
             articleNo: discount?.ArticleNo?.[0] || '',
             articlePrice: parseFloat(discount?.ArticlePrice?.[0] || 0),
             agreedPrice: parseFloat(discount?.AgreedPrice?.[0] || 0),
