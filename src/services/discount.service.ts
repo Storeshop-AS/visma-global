@@ -40,8 +40,11 @@ export class DiscountService {
     const _fromDate = fromDate.format('YYYY-MM-DD');
     if (discountData?.PriceMatrix?.Prices?.Price) {
       for (const discount of discountData?.PriceMatrix?.Prices?.Price) {
+        const currentDate = new Date();
         const updated = discount?.LastUpdate?.[0] || '';
-        if (updated > _fromDate) {
+        const stopDate = new Date(discount?.StopDate?.[0] || '');
+
+        if (updated > _fromDate && stopDate >= currentDate) {
           discounts.push({
             discountType: discount?.DiscountType?.[0] || '',
             dustomerNo: discount?.CustomerNo?.[0] || '',
