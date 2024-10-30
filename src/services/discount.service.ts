@@ -74,6 +74,8 @@ export class DiscountService {
         const currentDate = new Date();
         const updated = discount?.LastUpdate?.[0] || '';
         const stopDate = new Date(discount?.StopDate?.[0] || '');
+        console.log(`fromDate 222: `, fromDate);
+        console.log(`updated 222: `, updated);
 
         if (updated > fromDate) {
           console.log(`stopDate 222: `, JSON.stringify(stopDate, null, ' '));
