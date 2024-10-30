@@ -25,3 +25,15 @@ export async function vismaGlobalDiscountUpdateToXp(tenant: any, discounts: any)
 
   return await axios.post(url, {discounts, tenant: {clientId: tenant.clientId, accessToken: tenant.accessToken, api: tenant.api}}, {headers, maxContentLength: Infinity, maxBodyLength: Infinity});
 }
+
+export async function vismaGlobalDiscountGroupUpdateToXp(tenant: any, discounts: any) {
+  const headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Basic " + Buffer.from('su' + ":" + 'tpwcom62020').toString("base64")
+  }
+
+  const url = tenant.url + '/visma-global-discount-group-update';
+  messageLog(tenant.user, `  POST ${url}`);
+
+  return await axios.post(url, {discounts, tenant: {clientId: tenant.clientId, accessToken: tenant.accessToken, api: tenant.api}}, {headers, maxContentLength: Infinity, maxBodyLength: Infinity});
+}

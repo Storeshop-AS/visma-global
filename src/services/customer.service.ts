@@ -85,6 +85,7 @@ export class CustomerService {
         const EmailAddress = customer?.EmailAddress?.[0] || '';
         const CompanyNo = customer?.CompanyNo?.[0] || '';
         const postalcode = customer?.PostCode?.[0] || '';
+        const discountGroupNo = customer?.CustomerGrpNo?.[0] || '';
 
         if (name.length > 0 && CustomerNo.length > 0) {
           customers.push({
@@ -93,7 +94,8 @@ export class CustomerService {
             CustomerNumber: CustomerNo,  // mandatory field to create a customer
             EmailAddress,
             CompanyNo,
-            postalcode
+            postalcode,
+            discountGroupNo,
           });
         }
       }

@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { TenantService, messageLog } from '../services/index.service';
-import { vismaGlobalDiscountUpdateToXp } from '../services/xp.service';
+import { vismaGlobalDiscountUpdateToXp, vismaGlobalDiscountGroupUpdateToXp } from '../services/xp.service';
 import { loadDiscountData, loadCustomerDiscount } from '../app/discount/discount';
 
 import { customers } from './customers';
@@ -50,6 +50,8 @@ async function syncCustomerDiscount() {
     messageLog(tenant.user, `-- Start of price list import`);
     const discounts = await loadCustomerDiscount(tenant, (process.env.npm_config_group || 2) as number, fromDate);
     console.log(`discounts: `, JSON.stringify(discounts, null, ' '));
+    const xpResponse = await vismaGlobalDiscountGroupUpdateToXp(tenant, discounts);
+    console.log(xpResponse?.data || 'No response found!');
   }
   catch (e: any) {
     messageLog(process.env.npm_config_user, 'ERROR initial data import: ' + e.message);
