@@ -65,4 +65,29 @@ export class DiscountService {
     }
     return discounts;
   }
+
+  public getPriceList(tenant: any, fromDate: any) {
+    const body: any = `<?xml version="1.0" encoding="UTF-8" ?>
+      <PriceMatrix>
+        <ClientInfo>
+          <Clientid>${tenant.clientId}</Clientid>
+          <Token>${tenant.accessToken}</Token>
+        </ClientInfo>
+        <Filter>
+          <QueryType>PriceList</QueryType>
+          <QueryTypeId>5</QueryTypeId>
+          <OnlyActivePrices></OnlyActivePrices>
+          <ShowOnWebYesNo>0</ShowOnWebYesNo>
+          <lastUpdate>${fromDate}</lastUpdate>
+        </Filter>
+      </PriceMatrix>`;
+
+    const url = tenant.api + '/Extension.svc/GetPriceMatrix';
+
+    const config = {
+      headers: {'Content-Type': 'text/xml', Accept: 'application/xml'}
+    };
+
+    return axios.post(url, body, config);
+  }
 }
