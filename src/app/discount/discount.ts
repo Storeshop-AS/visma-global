@@ -35,13 +35,13 @@ export async function loadPriceList(tenant: any, groupId: number, fromDate: mome
   try {
     const _fromDate = fromDate.format('DD.MM.YYYY');
     const priceListRawData = await discountService.getPriceList(tenant, groupId, _fromDate);
-    const filename = `./data/${tenant.user}-price-list-${_fromDate}.xml`;
-    fs.writeFileSync(filename, priceListRawData.data);
+    const xmlFilename = `./data/${tenant.user}-price-list-${_fromDate}.xml`;
+    fs.writeFileSync(xmlFilename, priceListRawData.data);
     if (priceListRawData) {
       const parser = new xml2js.Parser();
       const discountJsonData = await parser.parseStringPromise(priceListRawData.data);
-      const filename = `./data/${tenant.user}-price-list-${_fromDate}.json`;
-      fs.writeFileSync(filename, discountJsonData);
+      const jsonFilename = `./data/${tenant.user}-price-list-${_fromDate}.json`;
+      fs.writeFileSync(jsonFilename, discountJsonData);
       if(discountJsonData && discountJsonData?.PriceMatrix && discountJsonData?.PriceMatrix?.Prices) {
         return discountService.getFormattedPriceList(discountJsonData, _fromDate);
       }
