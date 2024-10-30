@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import moment from 'moment';
 
 import { TenantService, messageLog } from '../services/index.service';
@@ -50,9 +49,6 @@ async function syncPriceList() {
   try {
     messageLog(tenant.user, `-- Start of price list import`);
     const priceList = await loadPriceList(tenant, (process.env.npm_config_group || 2) as number, fromDate);
-    const jsonFilename = `./data/${tenant.user}-price-list-${fromDate.format('DD.MM.YYYY')}.json`;
-    fs.writeFileSync(jsonFilename, priceList);
-
     console.log(`priceList: `, JSON.stringify(priceList, null, ' '));
   }
   catch (e: any) {

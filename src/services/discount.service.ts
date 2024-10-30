@@ -70,6 +70,8 @@ export class DiscountService {
     let priceList = [];
     if (discountData?.PriceMatrix?.Prices) {
       for (const discount of discountData?.PriceMatrix?.Prices[0]?.Price) {
+        console.log(`discount: `, JSON.stringify(discount, null, ' '));
+
         const currentDate = new Date();
         const updated = discount?.LastUpdate?.[0] || '';
         const stopDate = new Date(discount?.StopDate?.[0] || '');
