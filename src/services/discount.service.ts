@@ -73,8 +73,9 @@ export class DiscountService {
         const currentDate = moment();
         const updated = moment(discount?.LastUpdate?.[0] || '');
         const stopDate = moment(discount?.StopDate?.[0] || '');
+        const discountType = parseInt(discount?.DiscountType?.[0] || 0);
 
-        if (updated > fromDate && stopDate >= currentDate) {
+        if (updated > fromDate && stopDate >= currentDate && discountType == 14) {
           priceList.push({
             articleNo: discount?.ArticleNo?.[0] || '',
             fromQuantity: parseInt(discount?.FromQuantity?.[0] || 0),
@@ -84,7 +85,7 @@ export class DiscountService {
             currency: discount?.CurrencyCode?.[0] || '',
             queryType: discount?.QueryType?.[0] || '',
             queryTypeId: discount?.QueryTypeId?.[0] || 0,
-            discountType: parseFloat(discount?.DiscountType?.[0] || 0),
+            discountType,
             discountI: parseFloat(discount?.DiscountI?.[0] || 0),
             discountII: parseFloat(discount?.DiscountII?.[0] || 0),
             discountIII: parseFloat(discount?.DiscountIII?.[0] || 0),
