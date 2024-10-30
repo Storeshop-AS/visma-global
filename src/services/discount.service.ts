@@ -14,27 +14,6 @@ export class DiscountService {
     this.config = config;
   }
 
-  public getPriceDiscounts(tenant: any, customerNo: any) {
-    const body: any = `<?xml version="1.0" encoding="UTF-8" ?>
-      <PriceMatrix>
-        <ClientInfo>
-          <Clientid>${tenant.clientId}</Clientid>
-          <Token>${tenant.accessToken}</Token>
-        </ClientInfo>
-        <Filter>
-          <customerNo>${customerNo}</customerNo>
-        </Filter>
-      </PriceMatrix>`;
-
-    const url = tenant.api + '/Extension.svc/GetPriceMatrix';
-
-    const config = {
-      headers: {'Content-Type': 'text/xml', Accept: 'application/xml'}
-    };
-
-    return axios.post(url, body, config);
-  }
-
   public getFormattedDiscounts(discountData: any, fromDate: moment.Moment): any {
     let discounts = [];
     const _fromDate = fromDate.format('YYYY-MM-DD');
@@ -66,7 +45,7 @@ export class DiscountService {
     return discounts;
   }
 
-  public getPriceList(tenant: any, fromDate: string) {
+  public getPriceDiscounts(tenant: any, customerNo: any) {
     const body: any = `<?xml version="1.0" encoding="UTF-8" ?>
       <PriceMatrix>
         <ClientInfo>
@@ -74,11 +53,62 @@ export class DiscountService {
           <Token>${tenant.accessToken}</Token>
         </ClientInfo>
         <Filter>
-          <QueryType>PriceList</QueryType>
-          <QueryTypeId>5</QueryTypeId>
-          <OnlyActivePrices></OnlyActivePrices>
-          <ShowOnWebYesNo>0</ShowOnWebYesNo>
-          <lastUpdate>${fromDate}</lastUpdate>
+          <customerNo>${customerNo}</customerNo>
+        </Filter>
+      </PriceMatrix>`;
+
+    const url = tenant.api + '/Extension.svc/GetPriceMatrix';
+
+    const config = {
+      headers: {'Content-Type': 'text/xml', Accept: 'application/xml'}
+    };
+
+    return axios.post(url, body, config);
+  }
+
+  public getFormattedPriceList(discountData: any, fromDate: string): any {
+    let priceList = [];
+    if (discountData?.PriceMatrix?.Prices) {
+      for (const discount of discountData?.PriceMatrix?.Prices[0]?.Price) {
+        const currentDate = new Date();
+        const updated = discount?.LastUpdate?.[0] || '';
+        const stopDate = new Date(discount?.StopDate?.[0] || '');
+
+        if (updated > fromDate && stopDate >= currentDate) {
+          priceList.push({
+            articleNo: discount?.ArticleNo?.[0] || '',
+            fromQuantity: parseInt(discount?.FromQuantity?.[0] || 0),
+            toQuantity: parseInt(discount?.ToQuantity?.[0] || 0),
+            articlePrice: parseFloat(discount?.ArticlePrice?.[0] || 0),
+            agreedPrice: parseFloat(discount?.AgreedPrice?.[0] || 0),
+            currency: discount?.CurrencyCode?.[0] || '',
+            queryType: discount?.QueryType?.[0] || '',
+            queryTypeId: discount?.QueryTypeId?.[0] || 0,
+            discount: parseFloat(discount?.DiscountType?.[0] || 0),
+            discountI: parseFloat(discount?.DiscountI?.[0] || 0),
+            discountII: parseFloat(discount?.DiscountII?.[0] || 0),
+            discountIII: parseFloat(discount?.DiscountIII?.[0] || 0),
+            startDate: discount?.StartDate?.[0] || '',
+            stopDate: discount?.StopDate?.[0] || '',
+            lastUpdate: discount?.LastUpdate?.[0] || '',
+          });
+        }
+      }
+    }
+    return priceList;
+  }
+
+  public getPriceList(tenant: any, groupId: number, fromDate: string) {
+    const body: any = `<?xml version="1.0" encoding="UTF-8" ?>
+      <PriceMatrix>
+        <ClientInfo>
+          <Clientid>${tenant.clientId}</Clientid>
+          <Token>${tenant.accessToken}</Token>
+        </ClientInfo>
+        <Filter>
+          <QueryType>CustomerDiscount</QueryType>
+          <QueryTypeId>${groupId}</QueryTypeId>
+          <LastUpdate>${fromDate}</LastUpdate>
         </Filter>
       </PriceMatrix>`;
 

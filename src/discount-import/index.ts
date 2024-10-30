@@ -48,7 +48,7 @@ async function syncPriceList() {
 
   try {
     messageLog(tenant.user, `-- Start of price list import`);
-    await loadPriceList(tenant, fromDate);
+    await loadPriceList(tenant, (process.env.npm_config_group || 2) as number, fromDate);
   }
   catch (e: any) {
     messageLog(process.env.npm_config_user, 'ERROR initial data import: ' + e.message);
