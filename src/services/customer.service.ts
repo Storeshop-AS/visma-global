@@ -41,6 +41,7 @@ export class CustomerService {
           <Phone/>
           <Fax/>
           <EmailAddress/>
+          <CustomerGrpNo/>
           <WebPage/>
           <CompanyNo/>
           <CountryCode/>
