@@ -30,20 +30,20 @@ export async function loadDiscountData(tenant: any, customerNo: any, fromDate: m
  * @param {any} tenant
  * @param {any} fromDate
  */
-export async function loadPriceList(tenant: any, groupId: number, fromDate: moment.Moment) {
+export async function loadCustomerDiscount(tenant: any, groupId: number, fromDate: moment.Moment) {
   const discountService = new DiscountService();
   try {
     const _fromDate = fromDate.format('DD.MM.YYYY');
-    const priceListRawData = await discountService.getPriceList(tenant, groupId, _fromDate);
-    if (priceListRawData) {
+    const discountRawData = await discountService.getCustomerDiscount(tenant, groupId, _fromDate);
+    if (discountRawData) {
       const xmlFilename = `./data/${tenant.user}-price-list-${_fromDate}.xml`;
-      fs.writeFileSync(xmlFilename, priceListRawData.data);
+      fs.writeFileSync(xmlFilename, discountRawData.data);
 
       const parser = new xml2js.Parser();
-      const discountJsonData = await parser.parseStringPromise(priceListRawData.data);
+      const discountJsonData = await parser.parseStringPromise(discountRawData.data);
       if(discountJsonData) {
         if(discountJsonData?.PriceMatrix && discountJsonData?.PriceMatrix?.Prices) {
-          return discountService.getFormattedPriceList(discountJsonData, fromDate);
+          return discountService.getFormattedCustomerDiscount(discountJsonData, fromDate);
         }
       }
     }

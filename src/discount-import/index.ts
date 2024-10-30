@@ -2,7 +2,7 @@ import moment from 'moment';
 
 import { TenantService, messageLog } from '../services/index.service';
 import { vismaGlobalDiscountUpdateToXp } from '../services/xp.service';
-import { loadDiscountData, loadPriceList } from '../app/discount/discount';
+import { loadDiscountData, loadCustomerDiscount } from '../app/discount/discount';
 
 import { customers } from './customers';
 
@@ -29,7 +29,7 @@ async function handleCustomer(tenant: any, fromDate: any, i = 0) {
   }
 }
 
-async function syncPriceList() {
+async function syncCustomerDiscount() {
   if (!process.env.npm_config_user) {
     console.log(`No tenant user found. Run "npm run initialDataImport -user=<user_name>"`);
     return;
@@ -48,8 +48,8 @@ async function syncPriceList() {
 
   try {
     messageLog(tenant.user, `-- Start of price list import`);
-    const priceList = await loadPriceList(tenant, (process.env.npm_config_group || 2) as number, fromDate);
-    console.log(`priceList: `, JSON.stringify(priceList, null, ' '));
+    const discounts = await loadCustomerDiscount(tenant, (process.env.npm_config_group || 2) as number, fromDate);
+    console.log(`discounts: `, JSON.stringify(discounts, null, ' '));
   }
   catch (e: any) {
     messageLog(process.env.npm_config_user, 'ERROR initial data import: ' + e.message);
@@ -88,4 +88,4 @@ async function syncDiscount() {
 }
 
 // syncDiscount();
-syncPriceList();
+syncCustomerDiscount();

@@ -66,20 +66,15 @@ export class DiscountService {
     return axios.post(url, body, config);
   }
 
-  public getFormattedPriceList(discountData: any, fromDate: moment.Moment): any {
+  public getFormattedCustomerDiscount(discountData: any, fromDate: moment.Moment): any {
     let priceList = [];
     if (discountData?.PriceMatrix?.Prices) {
       for (const discount of discountData?.PriceMatrix?.Prices[0]?.Price) {
-
-        const currentDate = new Date();
+        const currentDate = moment();
         const updated = moment(discount?.LastUpdate?.[0] || '');
-        const stopDate = new Date(discount?.StopDate?.[0] || '');
-        console.log(`fromDate 222: `, fromDate);
-        console.log(`updated 222: `, updated);
+        const stopDate = moment(discount?.StopDate?.[0] || '');
 
-        if (updated > fromDate) {
-          console.log(`stopDate 222: `, JSON.stringify(stopDate, null, ' '));
-          console.log(`discount 222: `, JSON.stringify(discount, null, ' '));
+        if (updated > fromDate && stopDate >= currentDate) {
           priceList.push({
             articleNo: discount?.ArticleNo?.[0] || '',
             fromQuantity: parseInt(discount?.FromQuantity?.[0] || 0),
@@ -89,7 +84,7 @@ export class DiscountService {
             currency: discount?.CurrencyCode?.[0] || '',
             queryType: discount?.QueryType?.[0] || '',
             queryTypeId: discount?.QueryTypeId?.[0] || 0,
-            discount: parseFloat(discount?.DiscountType?.[0] || 0),
+            discountType: parseFloat(discount?.DiscountType?.[0] || 0),
             discountI: parseFloat(discount?.DiscountI?.[0] || 0),
             discountII: parseFloat(discount?.DiscountII?.[0] || 0),
             discountIII: parseFloat(discount?.DiscountIII?.[0] || 0),
@@ -103,7 +98,7 @@ export class DiscountService {
     return priceList;
   }
 
-  public getPriceList(tenant: any, groupId: number, fromDate: string) {
+  public getCustomerDiscount(tenant: any, groupId: number, fromDate: string) {
     const body: any = `<?xml version="1.0" encoding="UTF-8" ?>
       <PriceMatrix>
         <ClientInfo>
