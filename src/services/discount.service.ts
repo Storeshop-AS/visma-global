@@ -72,7 +72,7 @@ export class DiscountService {
       for (const discount of discountData?.PriceMatrix?.Prices[0]?.Price) {
 
         const currentDate = new Date();
-        const updated = discount?.LastUpdate?.[0] || '';
+        const updated = moment(discount?.LastUpdate?.[0] || '');
         const stopDate = new Date(discount?.StopDate?.[0] || '');
         console.log(`fromDate 222: `, fromDate);
         console.log(`updated 222: `, updated);
