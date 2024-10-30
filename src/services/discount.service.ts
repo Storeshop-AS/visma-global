@@ -75,7 +75,8 @@ export class DiscountService {
         const updated = discount?.LastUpdate?.[0] || '';
         const stopDate = new Date(discount?.StopDate?.[0] || '');
 
-        if (updated > fromDate && stopDate >= currentDate) {
+        if (updated > fromDate) {
+          console.log(`stopDate 222: `, JSON.stringify(stopDate, null, ' '));
           console.log(`discount 222: `, JSON.stringify(discount, null, ' '));
           priceList.push({
             articleNo: discount?.ArticleNo?.[0] || '',
