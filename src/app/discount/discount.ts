@@ -42,9 +42,6 @@ export async function loadPriceList(tenant: any, groupId: number, fromDate: mome
       const parser = new xml2js.Parser();
       const discountJsonData = await parser.parseStringPromise(priceListRawData.data);
       if(discountJsonData) {
-        const jsonFilename = `./data/${tenant.user}-price-list-${_fromDate}.json`;
-        fs.writeFileSync(jsonFilename, discountJsonData);
-
         if(discountJsonData?.PriceMatrix && discountJsonData?.PriceMatrix?.Prices) {
           return discountService.getFormattedPriceList(discountJsonData, _fromDate);
         }
