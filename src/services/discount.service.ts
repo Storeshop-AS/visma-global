@@ -66,7 +66,7 @@ export class DiscountService {
     return discounts;
   }
 
-  public getPriceList(tenant: any, fromDate: any) {
+  public getPriceList(tenant: any, fromDate: string) {
     const body: any = `<?xml version="1.0" encoding="UTF-8" ?>
       <PriceMatrix>
         <ClientInfo>

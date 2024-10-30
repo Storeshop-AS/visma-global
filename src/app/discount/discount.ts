@@ -33,16 +33,17 @@ export async function loadDiscountData(tenant: any, customerNo: any, fromDate: m
 export async function loadPriceList(tenant: any, fromDate: moment.Moment) {
   const discountService = new DiscountService();
   try {
-    const priceListRawData = await discountService.getPriceList(tenant, fromDate);
-    const filename = `./data/${tenant.user}-price-list-${fromDate}.xml`;
+    const _fromDate = fromDate.format('DD.MM.YYYY');
+    const priceListRawData = await discountService.getPriceList(tenant, _fromDate);
+    const filename = `./data/${tenant.user}-price-list-${_fromDate}.xml`;
     fs.writeFileSync(filename, priceListRawData.data);
     if (priceListRawData) {
       const parser = new xml2js.Parser();
       const discountJsonData = await parser.parseStringPromise(priceListRawData.data);
-      const filename = `./data/${tenant.user}-price-list-${fromDate}.json`;
+      const filename = `./data/${tenant.user}-price-list-${_fromDate}.json`;
       fs.writeFileSync(filename, discountJsonData);
       if(discountJsonData && discountJsonData?.PriceMatrix && discountJsonData?.PriceMatrix?.Prices) {
-        // return discountService.getFormattedDiscounts(discountJsonData, fromDate);
+        // return discountService.getFormattedDiscounts(discountJsonData, _fromDate);
       }
     }
   }
