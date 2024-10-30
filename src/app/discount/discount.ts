@@ -35,16 +35,19 @@ export async function loadPriceList(tenant: any, groupId: number, fromDate: mome
   try {
     const _fromDate = fromDate.format('DD.MM.YYYY');
     const priceListRawData = await discountService.getPriceList(tenant, groupId, _fromDate);
-    const xmlFilename = `./data/${tenant.user}-price-list-${_fromDate}.xml`;
-    fs.writeFileSync(xmlFilename, priceListRawData.data);
     if (priceListRawData) {
+      const xmlFilename = `./data/${tenant.user}-price-list-${_fromDate}.xml`;
+      fs.writeFileSync(xmlFilename, priceListRawData.data);
+
       const parser = new xml2js.Parser();
       const discountJsonData = await parser.parseStringPromise(priceListRawData.data);
-      console.log(`discountJsonData: `, JSON.stringify(discountJsonData, null, ' '));
-      // const jsonFilename = `./data/${tenant.user}-price-list-${_fromDate}.json`;
-      // fs.writeFileSync(jsonFilename, discountJsonData);
-      if(discountJsonData && discountJsonData?.PriceMatrix && discountJsonData?.PriceMatrix?.Prices) {
-        return discountService.getFormattedPriceList(discountJsonData, _fromDate);
+      if(discountJsonData) {
+        const jsonFilename = `./data/${tenant.user}-price-list-${_fromDate}.json`;
+        fs.writeFileSync(jsonFilename, discountJsonData);
+
+        if(discountJsonData?.PriceMatrix && discountJsonData?.PriceMatrix?.Prices) {
+          return discountService.getFormattedPriceList(discountJsonData, _fromDate);
+        }
       }
     }
   }
