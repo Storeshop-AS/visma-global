@@ -40,14 +40,14 @@ export async function loadPriceList(tenant: any, groupId: number, fromDate: mome
     if (priceListRawData) {
       const parser = new xml2js.Parser();
       const discountJsonData = await parser.parseStringPromise(priceListRawData.data);
-      const jsonFilename = `./data/${tenant.user}-price-list-${_fromDate}.json`;
-      fs.writeFileSync(jsonFilename, discountJsonData);
+      // const jsonFilename = `./data/${tenant.user}-price-list-${_fromDate}.json`;
+      // fs.writeFileSync(jsonFilename, discountJsonData);
       if(discountJsonData && discountJsonData?.PriceMatrix && discountJsonData?.PriceMatrix?.Prices) {
         return discountService.getFormattedPriceList(discountJsonData, _fromDate);
       }
     }
   }
   catch (error: any) {
-    messageLog(tenant.user, 'ERROR discounts import failed: ' + error);
+    messageLog(tenant.user, 'ERROR price list import failed: ' + error);
   }
 }

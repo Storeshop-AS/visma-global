@@ -48,7 +48,8 @@ async function syncPriceList() {
 
   try {
     messageLog(tenant.user, `-- Start of price list import`);
-    await loadPriceList(tenant, (process.env.npm_config_group || 2) as number, fromDate);
+    const priceList = await loadPriceList(tenant, (process.env.npm_config_group || 2) as number, fromDate);
+    console.log(`priceList: `, JSON.stringify(priceList, null, ' '));
   }
   catch (e: any) {
     messageLog(process.env.npm_config_user, 'ERROR initial data import: ' + e.message);
