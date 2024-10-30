@@ -66,7 +66,7 @@ export class DiscountService {
     return axios.post(url, body, config);
   }
 
-  public getFormattedPriceList(discountData: any, fromDate: string): any {
+  public getFormattedPriceList(discountData: any, fromDate: moment.Moment): any {
     let priceList = [];
     if (discountData?.PriceMatrix?.Prices) {
       for (const discount of discountData?.PriceMatrix?.Prices[0]?.Price) {

@@ -43,7 +43,7 @@ export async function loadPriceList(tenant: any, groupId: number, fromDate: mome
       const discountJsonData = await parser.parseStringPromise(priceListRawData.data);
       if(discountJsonData) {
         if(discountJsonData?.PriceMatrix && discountJsonData?.PriceMatrix?.Prices) {
-          return discountService.getFormattedPriceList(discountJsonData, _fromDate);
+          return discountService.getFormattedPriceList(discountJsonData, fromDate);
         }
       }
     }
