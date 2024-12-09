@@ -6,7 +6,7 @@ import { TenantService } from '../../services/tenant.service';
 
 const router: Router = Router({mergeParams: true});
 
-class DiscountsController {
+class DiscountController {
     async get(req: Request, res: Response) {
         if (!req.query.user) {
             return res.status(500).send({
@@ -36,8 +36,8 @@ class DiscountsController {
     }
 }
 
-const controller = new DiscountsController();
+const controller = new DiscountController();
 
 router.get('/', controller.get);
 
-export const discountsController: Router = router;
+export const discountController: Router = router;
