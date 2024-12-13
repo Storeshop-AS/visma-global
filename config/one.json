@@ -1,16 +1,6 @@
 {
   "tenants": [
     {
-      "user": "halden",
-      "password": "tpwcom62020",
-      "integration": "xxxxvisma-global",
-      "api": "http://213.138.161.117:81",
-      "clientId": "Gummi &amp; Maskinteknikk AS",
-      "accessTokenRetired": "79077240-eeb8-4806-8040-35ca560bd9e6",
-      "accessToken": "79077240-eeb8-4806-8040-35ca560bd9e6",
-      "url": "https://gummas.no/admin/_/service/com.storeshop.app"
-    },
-    {
       "user": "loftet",
       "password": "tpwcom62020",
       "integration": "visma-global",
