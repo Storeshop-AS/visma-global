@@ -31,7 +31,7 @@ async function handleCustomer(tenant: any, fromDate: any, i = 0) {
 
 async function syncCustomerDiscount() {
   if (!process.env.npm_config_user) {
-    console.log(`No tenant user found. Run "npm run discountImport -user=<user_name>"`);
+    console.log(`No tenant user found. Run "npm run discountImport -user=<user_name> -group=2"`);
     return;
   }
 
