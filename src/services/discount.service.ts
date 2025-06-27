@@ -77,7 +77,7 @@ export class DiscountService {
 
         if (updated > fromDate && stopDate >= currentDate && discountType == 14) {
           priceList.push({
-            articleNo: (discount?.ArticleNo?.[0] || '').replace(/\//g, '-'),
+            articleNo: discount?.ArticleNo?.[0] || '',
             fromQuantity: parseInt(discount?.FromQuantity?.[0] || 0),
             toQuantity: parseInt(discount?.ToQuantity?.[0] || 0),
             articlePrice: parseFloat(discount?.ArticlePrice?.[0] || 0),
