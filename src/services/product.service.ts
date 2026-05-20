@@ -90,7 +90,7 @@ export class ProductService {
           data: {
             ExternalId: article?.articleid?.[0] || '',
             price: parseFloat(article?.price1?.[0] || 0),
-            stock: parseInt(article['StockSurvey.Available']?.[0] || 0, 10),
+            stock: parseFloat(article['StockSurvey.Available']?.[0] || 0),
             accountingLastChanged: article.LastUpdate?.[0],
             IsActive: article?.inactiveyesno?.[0] === '0'
           }
@@ -118,7 +118,7 @@ export class ProductService {
             name,
             ExternalId: article?.articleid?.[0] || '',
             price: parseFloat(article?.price1?.[0] || 0),
-            stock: parseInt(article['StockSurvey.Available']?.[0] || 0, 10),
+            stock: parseFloat(article['StockSurvey.Available']?.[0] || 0),
             IsActive
           });
         }
