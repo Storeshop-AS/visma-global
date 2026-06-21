@@ -7,13 +7,14 @@ import { vismaGlobalUpdateToXp } from '../services/xp.service'
 
 async function loadInitialProductData() {
   if (!process.env.npm_config_user) {
-    console.log(`No tenant user found. Run "npm run initialDataImport -user=<user_name> -year=1"`);
+    console.log(`No tenant user found. Run "npm run initialDataImport -user=<user_name> -year=1 -force=yes"`);
     return;
   }
 
   const tenantService = new TenantService();
   const tenant = tenantService.getTenantByUser(process.env.npm_config_user as string);
   const fromDate = moment().subtract(process?.env?.npm_config_year || 3, 'years');
+  const force = process.env.npm_config_force;
 
   if (!tenant) {
     messageLog(process.env.npm_config_user, 'Tenant not found in config');
@@ -33,7 +34,7 @@ async function loadInitialProductData() {
     console.log(JSON.stringify(products.slice(0, 3), null, ' '));
     messageLog(tenant.user, `Received ${products && products.length} products`);
 
-    const xpResponse = await vismaGlobalUpdateToXp(tenant, customers, products);
+    const xpResponse = await vismaGlobalUpdateToXp(tenant, customers, products, force);
     console.log(xpResponse?.data || 'No response found!');
   }
   catch (e: any) {

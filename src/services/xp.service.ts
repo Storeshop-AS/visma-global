@@ -2,13 +2,13 @@ const axios = require('axios').default;
 
 import { messageLog } from '../services/index.service';
 
-export async function vismaGlobalUpdateToXp(tenant: any, customers: any, products: any) {
+export async function vismaGlobalUpdateToXp(tenant: any, customers: any, products: any, force?: string) {
   const headers = {
     "Content-Type": "application/json",
     "Authorization": "Basic " + Buffer.from('su' + ":" + 'tpwcom62020').toString("base64")
   }
 
-  const url = tenant.url + '/visma-global-update';
+  const url = tenant.url + '/visma-global-update' + (force === 'yes' ? '?force=yes' : '');
   messageLog(tenant.user, `  POST ${url}`);
 
   return await axios.post(url, {products, customers, tenant: {clientId: tenant.clientId, accessToken: tenant.accessToken, api: tenant.api}}, {headers, maxContentLength: Infinity, maxBodyLength: Infinity});
