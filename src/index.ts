@@ -19,16 +19,29 @@ app.use("/api", ApiController);
 http.createServer(app).listen(port, () => {
   console.log(`Listening at http://localhost:${port}/`);
 
-  // This scheduler will run in every 1 hour min for extract data from visma global and load to XP
-  const SYNC_INTERVAL = 60 * 60 * 1000; // 60 minutes
+  const SYNC_INTERVAL = 2 * 60 * 60 * 1000;
+  let lastForceSyncDate = '';
 
-  importProductAndCustomerDaemon();
-  setInterval(importProductAndCustomerDaemon, SYNC_INTERVAL);
+  scheduleNextSync();
+
+  function scheduleNextSync() {
+    const nextSync = moment().add(2, 'hours');
+    console.log(`Next Visma Global sync scheduled at ${nextSync.format('DD.MM.YYYY HH:mm')}`);
+
+    setTimeout(async () => {
+      await importProductAndCustomerDaemon();
+      scheduleNextSync();
+    }, SYNC_INTERVAL);
+  }
 
   async function importProductAndCustomerDaemon() {
     const tenantService = new TenantService();
     const tenants = tenantService.getTenantsByIntegration(INTEGRATIONS.vismaGlobal);
     console.log(`VismaGlobal Tenants: ${JSON.stringify(tenants, null, ' ')}`);
+
+    const today = moment().format('YYYY-MM-DD');
+    const force = lastForceSyncDate === today ? 'no' : 'yes';
+    lastForceSyncDate = today;
   
     for (const tenant of tenants) {
       const fromDate = moment().subtract(7, 'days');
@@ -41,7 +54,7 @@ http.createServer(app).listen(port, () => {
         const products = await loadProductData(tenant, fromDate);
         messageLog(tenant.user, `Received ${products && products.length} products`);
 
-        const xpResponse = await vismaGlobalUpdateToXp(tenant, customers, products);
+        const xpResponse = await vismaGlobalUpdateToXp(tenant, customers, products, force);
         console.log(xpResponse?.data || 'No response found!');
       }
       catch (e: any) {
