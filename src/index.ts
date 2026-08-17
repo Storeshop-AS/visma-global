@@ -39,7 +39,6 @@ http.createServer(app).listen(port, () => {
   async function importProductAndCustomerDaemon() {
     const tenantService = new TenantService();
     const tenants = tenantService.getTenantsByIntegration(INTEGRATIONS.vismaGlobal);
-    console.log(`VismaGlobal Tenants: ${JSON.stringify(tenants, null, ' ')}`);
 
     const hoursPerForce = 24 / FORCE_TIMES_PER_DAY;
     const forceSlot = `${moment().format('YYYY-MM-DD')}-${Math.floor(moment().hour() / hoursPerForce)}`;
