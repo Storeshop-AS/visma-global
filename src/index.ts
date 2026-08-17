@@ -20,7 +20,7 @@ http.createServer(app).listen(port, () => {
   console.log(`Listening at http://localhost:${port}/`);
 
   const SYNC_INTERVAL = 2 * 60 * 60 * 1000;
-  const FORCE_TIMES_PER_DAY = 8;
+  const FORCE_TIMES_PER_DAY = 12;
   let lastForceSlot = '';
 
   scheduleNextSync();
@@ -44,7 +44,7 @@ http.createServer(app).listen(port, () => {
     const forceSlot = `${moment().format('YYYY-MM-DD')}-${Math.floor(moment().hour() / hoursPerForce)}`;
     const force = lastForceSlot === forceSlot ? 'no' : 'yes';
     lastForceSlot = forceSlot;
-  
+
     for (const tenant of tenants) {
       const fromDate = moment().subtract(7, 'days');
       try {
