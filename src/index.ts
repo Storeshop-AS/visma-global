@@ -20,7 +20,7 @@ http.createServer(app).listen(port, () => {
   console.log(`Listening at http://localhost:${port}/`);
 
   const SYNC_INTERVAL = 2 * 60 * 60 * 1000;
-  const FORCE_TIMES_PER_DAY = 4;
+  const FORCE_TIMES_PER_DAY = 8;
   let lastForceSlot = '';
 
   scheduleNextSync();
