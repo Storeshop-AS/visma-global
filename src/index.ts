@@ -20,10 +20,7 @@ http.createServer(app).listen(port, () => {
   console.log(`Listening at http://localhost:${port}/`);
 
   const SYNC_INTERVAL = 2 * 60 * 60 * 1000;
-  const FORCE_TIMES_PER_DAY = 6;
-  let lastForceSlot = '';
 
-  importProductAndCustomerDaemon(); // one-shot test run on boot
   scheduleNextSync();
 
   function scheduleNextSync() {
@@ -40,11 +37,6 @@ http.createServer(app).listen(port, () => {
     const tenantService = new TenantService();
     const tenants = tenantService.getTenantsByIntegration(INTEGRATIONS.vismaGlobal);
 
-    const hoursPerForce = 24 / FORCE_TIMES_PER_DAY;
-    const forceSlot = `${moment().format('YYYY-MM-DD')}-${Math.floor(moment().hour() / hoursPerForce)}`;
-    const force = lastForceSlot === forceSlot ? 'no' : 'yes';
-    lastForceSlot = forceSlot;
-
     for (const tenant of tenants) {
       const fromDate = moment().subtract(7, 'days');
       try {
@@ -56,7 +48,7 @@ http.createServer(app).listen(port, () => {
         const products = await loadProductData(tenant, fromDate);
         messageLog(tenant.user, `Received ${products && products.length} products`);
 
-        const xpResponse = await vismaGlobalUpdateToXp(tenant, customers, products, force);
+        const xpResponse = await vismaGlobalUpdateToXp(tenant, customers, products, 'yes');
         console.log(xpResponse?.data || 'No response found!');
       }
       catch (e: any) {
