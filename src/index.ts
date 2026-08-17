@@ -23,6 +23,7 @@ http.createServer(app).listen(port, () => {
   const FORCE_TIMES_PER_DAY = 6;
   let lastForceSlot = '';
 
+  importProductAndCustomerDaemon(); // one-shot test run on boot
   scheduleNextSync();
 
   function scheduleNextSync() {
