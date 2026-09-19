@@ -38,7 +38,7 @@ http.createServer(app).listen(port, () => {
     const tenants = tenantService.getTenantsByIntegration(INTEGRATIONS.vismaGlobal);
 
     for (const tenant of tenants) {
-      const fromDate = moment().subtract(7, 'days');
+      const fromDate = moment().subtract(1, 'month');
       try {
         messageLog(tenant.user, `-- Start of data sync from ${fromDate.format('DD.MM.YYYY')}`);
 
