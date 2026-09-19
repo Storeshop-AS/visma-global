@@ -19,7 +19,7 @@ app.use("/api", ApiController);
 http.createServer(app).listen(port, () => {
   console.log(`Listening at http://localhost:${port}/`);
 
-  const SYNC_INTERVAL = 2 * 60 * 60 * 1000;
+  const SYNC_INTERVAL = 2 * 60 * 60 * 1000; // 2 hours
 
   scheduleNextSync();
 
